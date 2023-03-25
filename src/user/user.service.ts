@@ -22,7 +22,7 @@ export class UserService {
     try {
 
       if (createUserDto.realName === '' || createUserDto.realName === undefined) {
-        throw new HttpException(`Input Field 'realName' have be send, it's a field neededd!`, HttpStatus.BAD_REQUEST);
+        throw new HttpException(`Input Field 'realName' have be send, it's a field needed!`, HttpStatus.BAD_REQUEST);
       }
 
       if (createUserDto.userName === '' || createUserDto.userName === undefined) {
