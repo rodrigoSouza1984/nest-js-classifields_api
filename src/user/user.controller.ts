@@ -1,10 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request  } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request , Query } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UseGuards } from '@nestjs/common/decorators';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from 'src/auth/auth.service';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { PaginatedUserDto } from './dto/paginated-user.dto';
+
 
 @Controller('user')
 export class UserController {
@@ -15,9 +18,10 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
+  //@UseGuards(JwtAuthGuard)
   @Get()
-  findAll() {
-    return this.userService.findAll();
+  async getAllUsers(@Query() query: { page: number; take: number; orderBy: 'ASC' | 'DESC' }): Promise<PaginatedUserDto> {    
+    return await this.userService.getAllUsers(query);
   }
 
   // @Get(':id')
