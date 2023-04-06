@@ -60,19 +60,20 @@ export class UserService {
     }
   }
 
-  async getAllUsers(query: {page: number; take: number; orderBy: 'ASC' | 'DESC';}): Promise<PaginatedUserDto> {
+
+  async getAllUsers(query: { page: number; take: number; orderBy: 'ASC' | 'DESC'; }): Promise<PaginatedUserDto> {
     try {
       let { page, take, orderBy } = query;
 
       if (!page) page = 1;
-      if (!take) take = 2;
-      if (!orderBy) orderBy = 'DESC';      
+      if (!take) take = 10;
+      if (!orderBy) orderBy = 'DESC';
 
       const [users, total] = await this.userRepository.findAndCount({
         skip: take * (page - 1),
         take,
         order: { id: orderBy },
-      })      
+      })
 
       return { total, users: users };
 
@@ -85,16 +86,110 @@ export class UserService {
     }
   }
 
+
+  async getUserById(userId: number): Promise<User | undefined> {
+    try {
+      const userExists = await this.userRepository.findOne({ where: { id: userId } });
+
+      if (!userExists) {
+        throw new HttpException(`User id:${userId} don't found`, HttpStatus.BAD_REQUEST);
+      }
+
+      return userExists
+
+    } catch (err) {
+      if (err.driverError) {
+        return err.driverError
+      } else {
+        throw err
+      }
+    }
+  }
+
+
+  async getByFilter(userId:number, query: any): Promise<User> {
+    try {
+
+      const userExists = await this.userRepository.findOne({ where: { id: userId } });
+
+      if (!userExists) {
+        throw new HttpException(`User id:${userId} don't found`, HttpStatus.BAD_REQUEST);
+      }
+
+      if (query.userName) {
+        const userExists = await this.userRepository.findOne({ where: { userName: query.userName } })
+
+        if (!userExists) {
+          throw new HttpException(`User ${query.userName} don't found`, HttpStatus.BAD_REQUEST);
+        }
+
+        return userExists
+      }
+      if (query.email) {
+        const userExists = await this.userRepository.findOne({ where: { email: query.email } })
+
+        if (!userExists) {
+          throw new HttpException(`User ${query.email} don't found`, HttpStatus.BAD_REQUEST);
+        }
+
+        return userExists
+      }
+
+    } catch (err) {
+      if (err.driverError) {
+        return err.driverError
+      } else {
+        throw err
+      }
+    }
+  }
+
+
+  async updateUser(userId: number, updateUserDto: UpdateUserDto) {
+    try {
+      const userExists = await this.userRepository.findOne({ where: { id: userId } })
+
+      if (!userExists) {
+        throw new HttpException(`User id:${userId} don't found`, HttpStatus.BAD_REQUEST);
+      }
+
+      return await this.userRepository.save({
+        ...updateUserDto,
+        id: Number(userId),
+      });
+
+    } catch (err) {
+      if (err.driverError) {
+        return err.driverError
+      } else {
+        throw err
+      }
+    }
+  }
+
+
+  async removeUser(userId: number) {
+    try {
+      const userExists = await this.userRepository.findOne({ where: { id: userId } })
+
+      if (!userExists) {
+        throw new HttpException(`User id:${userId} don't found`, HttpStatus.BAD_REQUEST);
+      }
+
+      return await this.userRepository.delete(userId)
+
+    } catch (err) {
+      if (err.driverError) {
+        return err.driverError
+      } else {
+        throw err
+      }
+    }
+  }
+
+
+  //FOR USE IN LOGIN AUTHSERVICE
   async findOne(email: string): Promise<User | undefined> {
     return this.userRepository.findOne({ where: { email: email } });
-  }
-
-  @UseGuards(JwtAuthGuard)
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
   }
 }

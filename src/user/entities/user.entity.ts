@@ -12,9 +12,8 @@ export enum TypePermissionEnum {
 
 @Entity()
 export class User {
-    @PrimaryGeneratedColumn()
-    @Generated('uuid')
-    id: string
+    @PrimaryGeneratedColumn()    
+    id: number
 
     @Column({ nullable: false })
     realName: string;
