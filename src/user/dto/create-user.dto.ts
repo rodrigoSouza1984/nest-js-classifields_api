@@ -4,5 +4,6 @@ export class CreateUserDto {
     email?: string;    
     password?: string;    
     confirmPassword?: string; 
-    urlImageAvatar?: string;   
+    urlImageAvatar?: string;  
+    emailCode?: number; 
 }

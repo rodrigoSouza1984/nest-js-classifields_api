@@ -8,6 +8,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { PaginatedUserDto } from './dto/paginated-user.dto';
 import { User } from './entities/user.entity';
+import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 
 
 @Controller('user')
@@ -53,6 +54,11 @@ export class UserController {
   @Post('login')
   async login(@Request() req) {    
     return this.authService.login(req.user);
+  }
+
+  @Post('forgetedOrUpdatePassword')
+  forgetedOrUpdatePassword(@Body() data:UpdateUserPasswordDto) {
+    return this.userService.forgetedOrUpdatePassword(data);
   }
 
 }

@@ -12,16 +12,16 @@ export enum TypePermissionEnum {
 
 @Entity()
 export class User {
-    @PrimaryGeneratedColumn()    
+    @PrimaryGeneratedColumn()
     id: number
 
     @Column({ nullable: false })
     realName: string;
 
-    @Column({ unique: true ,nullable: false })
+    @Column({ unique: true, nullable: false })
     userName: string;
 
-    @Column({ unique:true, nullable: false })
+    @Column({ unique: true, nullable: false })
     email: string;
 
     @Column({ nullable: false })
@@ -30,9 +30,11 @@ export class User {
     @Column({ nullable: true })
     urlImageAvatar: string;
 
+    @Column({ nullable: true })
+    dateOfBirth: string;
+
     @Column()
-    @Generated('uuid')
-    emailCode: string;
+    emailCode: number;   
 
     @Column({
         type: 'enum',

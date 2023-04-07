@@ -8,15 +8,17 @@ import { HttpException } from '@nestjs/common/exceptions';
 import { HttpStatus } from '@nestjs/common/enums';
 
 import * as bcrypt from 'bcrypt';
-import { UseGuards } from '@nestjs/common/decorators';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { PaginatedUserDto } from './dto/paginated-user.dto';
+import { EmailSendService } from 'src/email-send/email-send.service';
+import * as chalk from 'chalk';
+import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 
 @Injectable()
 export class UserService {
 
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
+    private emailSendService: EmailSendService,
   ) { }
 
   async create(createUserDto: CreateUserDto) {
@@ -47,9 +49,16 @@ export class UserService {
       user.userName = createUserDto.userName
       user.realName = createUserDto.realName
       user.email = createUserDto.email
+      user.emailCode = Math.floor(Math.random() * 9000) + 1000;
       user.password = bcrypt.hashSync(createUserDto.password, 8)
 
-      return await this.userRepository.save(user);
+      const userCreated = await this.userRepository.save(user);
+
+      // if(userCreated){
+      //   await this.emailSendService.sendEmail(user.email, {emailCode: user.emailCode, subject: 'Criação do Usuário no Apk Classifields'})
+      // }
+
+      return userCreated
 
     } catch (err) {
       if (err.driverError) {
@@ -107,7 +116,7 @@ export class UserService {
   }
 
 
-  async getByFilter(userId:number, query: any): Promise<User> {
+  async getByFilter(userId: number, query: any): Promise<User> {
     try {
 
       const userExists = await this.userRepository.findOne({ where: { id: userId } });
@@ -187,6 +196,58 @@ export class UserService {
     }
   }
 
+  async forgetedOrUpdatePassword(data: UpdateUserPasswordDto) {
+    try {
+
+      if (!data.email) {
+        throw new HttpException(`Email must to be send on the body`, HttpStatus.BAD_REQUEST);
+      }
+
+      const userExists = await this.findOne(data.email)
+
+      if (!userExists) {
+        throw new HttpException(`User email:${data.email} don't found`, HttpStatus.BAD_REQUEST);
+      }
+
+      if (data.password) {
+
+        data.password = bcrypt.hashSync(data.password, 8)
+
+        return await this.userRepository.save({
+          ...data,
+          id: Number(userExists.id),
+        });
+      } else {
+        const newPassword = `ab@${Math.floor(Math.random() * 9000) + 1000}`
+
+        data.password = bcrypt.hashSync(newPassword, 8)
+
+        const updatePassword = await this.userRepository.save({
+          ...data,
+          id: Number(userExists.id),
+        });
+
+        if (updatePassword) {
+          await this.emailSendService.sendEmail(
+            data.email, {
+            newPassword: newPassword,
+            subject: 'Nova Senha Classifields',
+            text: `NOVA SENHA : ${newPassword}.\n 
+            Use sua nova senha, após uso se desejar troque para uma de sua escolha,\n 
+            realizando uma atualização de cadastro`
+          }
+          )
+        }
+      }
+
+    } catch (err) {
+      if (err.driverError) {
+        return err.driverError
+      } else {
+        throw err
+      }
+    }
+  }
 
   //FOR USE IN LOGIN AUTHSERVICE
   async findOne(email: string): Promise<User | undefined> {
