@@ -27,7 +27,7 @@ export class User {
     @Column({ nullable: false })
     password: string;
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, type: 'longtext'})
     urlImageAvatar: string;
 
     @Column({ nullable: true })
@@ -35,6 +35,9 @@ export class User {
 
     @Column()
     emailCode: number;   
+
+    @Column({default: 0})
+    qtdTryingSendEmail: number; 
 
     @Column({
         type: 'enum',

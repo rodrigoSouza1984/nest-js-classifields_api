@@ -3,5 +3,6 @@ import { CreateUserDto } from './create-user.dto';
 
 export class UpdateUserPasswordDto extends PartialType(CreateUserDto) {
     password?: string;
-    email?:string      
+    email?:string  
+    qtdTryingSendEmail?:number    
 }

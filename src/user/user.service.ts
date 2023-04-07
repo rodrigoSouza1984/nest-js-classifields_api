@@ -196,7 +196,7 @@ export class UserService {
     }
   }
 
-  async forgetedOrUpdatePassword(data: UpdateUserPasswordDto) {
+  async forgetedOrUpdatePassword(data: UpdateUserPasswordDto) {//when to try 3 time send email, on 3 time return the code generate for send other form because email this bug
     try {
 
       if (!data.email) {
@@ -222,8 +222,13 @@ export class UserService {
 
         data.password = bcrypt.hashSync(newPassword, 8)
 
+        let userUpdate = {
+          password : data.password,
+          qtdTryingSendEmail: userExists.qtdTryingSendEmail + 1
+        }        
+
         const updatePassword = await this.userRepository.save({
-          ...data,
+          ...userUpdate,
           id: Number(userExists.id),
         });
 
@@ -237,6 +242,10 @@ export class UserService {
             realizando uma atualização de cadastro`
           }
           )
+        }
+
+        if(userUpdate.qtdTryingSendEmail === 3 ){
+          return {passord:newPassword}
         }
       }
 
