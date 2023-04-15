@@ -6,6 +6,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { EmailSendModule } from './email-send/email-send.module';
+import { MediaAvatarModule } from './media-avatar/media-avatar.module';
+
 
 
 @Module({
@@ -18,18 +20,19 @@ import { EmailSendModule } from './email-send/email-send.module';
       username: process.env.DB_USER,
       password: process.env.DB_PASSWORD,
       database: process.env.DB_NAME,
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],      
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
       authPlugins: {
         mysql_native_password: () => require('mysql2-aurora-data-api-plugin')
       },
       autoLoadEntities: true,
       synchronize: true,
-      logging: false,      
+      logging: false,
     }),
   }),
-  UserModule,
-  AuthModule,
-  EmailSendModule
+    UserModule,
+    AuthModule,
+    EmailSendModule,
+    MediaAvatarModule
   ],
   controllers: [AppController],
   providers: [AppService],

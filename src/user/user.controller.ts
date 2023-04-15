@@ -5,18 +5,23 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { UseGuards } from '@nestjs/common/decorators';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from 'src/auth/auth.service';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { PaginatedUserDto } from './dto/paginated-user.dto';
 import { User } from './entities/user.entity';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
+import { MediaAvatarService } from 'src/media-avatar/media-avatar.service';
+
 
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService, private authService: AuthService) {}
+  constructor(
+    private readonly userService: UserService, 
+    private authService: AuthService, 
+    private mediaAvatarService : MediaAvatarService
+  ) {}
   
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {
+  create(@Body() createUserDto: CreateUserDto) {    
     return this.userService.create(createUserDto);
   }
 
@@ -30,7 +35,7 @@ export class UserController {
   @Get(':userId')
   getUserById(@Param('userId') userId: number) {
     return this.userService.getUserById(userId);
-  }  
+  }    
 
   //@UseGuards(JwtAuthGuard)
   @Get('getByFilter/:userId')
@@ -57,8 +62,19 @@ export class UserController {
   }
 
   @Post('forgetedOrUpdatePassword')
-  forgetedOrUpdatePassword(@Body() data:UpdateUserPasswordDto) {
+  forgetedOrUpdatePassword(@Body() data:UpdateUserPasswordDto) {    
     return this.userService.forgetedOrUpdatePassword(data);
   }
+
+  //@UseGuards(JwtAuthGuard)
+  // @Delete('/a/a/a/a')
+  // async deleteMediaAvatar() {
+  //   return await this.mediaAvatarService.deleteMedia();
+  // }
+
+  // @Get('a/a/a/a/a')
+  // a(){
+  //   return this.userService.a();
+  // }
 
 }

@@ -1,4 +1,5 @@
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, Generated, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { MediaAvatarEntity } from "../../media-avatar/entities/media-avatar.entity";
 
 export enum UserStatusEnum {
     ACTIVE = 'active',
@@ -25,19 +26,16 @@ export class User {
     email: string;
 
     @Column({ nullable: false })
-    password: string;
-
-    @Column({ nullable: true, type: 'longtext'})
-    urlImageAvatar: string;
+    password: string;    
 
     @Column({ nullable: true })
     dateOfBirth: string;
 
     @Column()
-    emailCode: number;   
+    emailCode: number;
 
-    @Column({default: 0})
-    qtdTryingSendEmail: number; 
+    @Column({ default: 0 })
+    qtdTryingSendEmail: number;
 
     @Column({
         type: 'enum',
@@ -52,6 +50,11 @@ export class User {
         default: TypePermissionEnum.USER,
     })
     type: TypePermissionEnum;
+
+    @OneToOne(() => MediaAvatarEntity, (mediaAvatar) => mediaAvatar.user, {
+        cascade: true,
+    })
+    mediaAvatar: MediaAvatarEntity;
 
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;

@@ -10,8 +10,12 @@ import { HttpStatus } from '@nestjs/common/enums';
 import * as bcrypt from 'bcrypt';
 import { PaginatedUserDto } from './dto/paginated-user.dto';
 import { EmailSendService } from 'src/email-send/email-send.service';
-import * as chalk from 'chalk';
+
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
+import { MediaAvatarService } from 'src/media-avatar/media-avatar.service';
+
+//import { MediaAvatarService } from './media-avatar.service';
+
 
 @Injectable()
 export class UserService {
@@ -19,6 +23,7 @@ export class UserService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     private emailSendService: EmailSendService,
+    private mediaAvatarService: MediaAvatarService
   ) { }
 
   async create(createUserDto: CreateUserDto) {
@@ -42,7 +47,7 @@ export class UserService {
 
       if (createUserDto.password !== createUserDto.confirmPassword) {
         throw new HttpException(`Password and confirmPassword must to be equals!`, HttpStatus.BAD_REQUEST);
-      }
+      } 
 
       const user = new User()
 
@@ -50,25 +55,37 @@ export class UserService {
       user.realName = createUserDto.realName
       user.email = createUserDto.email
       user.emailCode = Math.floor(Math.random() * 9000) + 1000;
-      user.password = bcrypt.hashSync(createUserDto.password, 8)
+      user.password = bcrypt.hashSync(createUserDto.password, 8)    
 
-      const userCreated = await this.userRepository.save(user);
+      const userCreated = await this.userRepository.save(user);      
+
+      if(userCreated && createUserDto.mediaAvatar){
+
+        let teste = []
+        teste.push(createUserDto.mediaAvatar)
+
+        for await (const a of teste){
+          await this.mediaAvatarService.create( userCreated.id, a)  
+        }
+
+        return await this.userRepository.findOne({ where: { id: userCreated.id }, relations: ['mediaAvatar'] })
+                        
+      }else{
+        return userCreated
+      }     
 
       // if(userCreated){
       //   await this.emailSendService.sendEmail(user.email, {emailCode: user.emailCode, subject: 'Criação do Usuário no Apk Classifields'})
-      // }
-
-      return userCreated
+      // }     
 
     } catch (err) {
       if (err.driverError) {
         return err.driverError
       } else {
-        throw err
+        return err
       }
     }
   }
-
 
   async getAllUsers(query: { page: number; take: number; orderBy: 'ASC' | 'DESC'; }): Promise<PaginatedUserDto> {
     try {
@@ -90,15 +107,14 @@ export class UserService {
       if (err.driverError) {
         return err.driverError
       } else {
-        throw err
+        return err
       }
     }
   }
 
-
-  async getUserById(userId: number): Promise<User | undefined> {
+  async getUserById(userId: number) {
     try {
-      const userExists = await this.userRepository.findOne({ where: { id: userId } });
+      const userExists = await this.userRepository.findOne({ where: { id: userId }, relations: ['mediaAvatar'] });
 
       if (!userExists) {
         throw new HttpException(`User id:${userId} don't found`, HttpStatus.BAD_REQUEST);
@@ -110,11 +126,10 @@ export class UserService {
       if (err.driverError) {
         return err.driverError
       } else {
-        throw err
+        return err
       }
     }
   }
-
 
   async getByFilter(userId: number, query: any): Promise<User> {
     try {
@@ -148,11 +163,10 @@ export class UserService {
       if (err.driverError) {
         return err.driverError
       } else {
-        throw err
+        return err
       }
     }
   }
-
 
   async updateUser(userId: number, updateUserDto: UpdateUserDto) {
     try {
@@ -171,11 +185,10 @@ export class UserService {
       if (err.driverError) {
         return err.driverError
       } else {
-        throw err
+        return err
       }
     }
   }
-
 
   async removeUser(userId: number) {
     try {
@@ -191,7 +204,7 @@ export class UserService {
       if (err.driverError) {
         return err.driverError
       } else {
-        throw err
+        return err
       }
     }
   }
@@ -253,7 +266,7 @@ export class UserService {
       if (err.driverError) {
         return err.driverError
       } else {
-        throw err
+        return err
       }
     }
   }
@@ -261,5 +274,6 @@ export class UserService {
   //FOR USE IN LOGIN AUTHSERVICE
   async findOne(email: string): Promise<User | undefined> {
     return this.userRepository.findOne({ where: { email: email } });
-  }
+  }  
+ 
 }

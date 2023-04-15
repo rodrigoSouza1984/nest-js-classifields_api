@@ -8,6 +8,7 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { UserService } from 'src/user/user.service';
 import { EmailSendService } from 'src/email-send/email-send.service';
+import { MediaAvatarService } from 'src/media-avatar/media-avatar.service';
 
 @Module({
   imports: [forwardRef(()=>UserModule),PassportModule,
@@ -16,7 +17,7 @@ import { EmailSendService } from 'src/email-send/email-send.service';
       signOptions: { expiresIn: '30000s' },
     }),
   ],
-  providers: [AuthService, LocalStrategy, JwtStrategy, UserService, EmailSendService],
+  providers: [AuthService, LocalStrategy, JwtStrategy, UserService, EmailSendService, MediaAvatarService],
 
   exports:  [AuthService]
 })
