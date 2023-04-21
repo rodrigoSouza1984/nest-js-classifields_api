@@ -1,6 +1,6 @@
 import { CreateUserDto } from "./create-user.dto";
 
 export class PaginatedUserDto {
-    total: number;
+    total: number;    
     users: CreateUserDto[];
 }

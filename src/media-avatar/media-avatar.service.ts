@@ -98,33 +98,6 @@ export class MediaAvatarService {
         return err
       }
     }
-  }
-
-  // async updateMediaAvatar(userId: number, data: MediaAvatarDto): Promise<User> {
-  //   try {
-
-  //     const userExists = await this.userRepository.findOne({ where: { id: userId }, relations: ['mediaAvatar'] })
-
-  //     if (!userExists) {
-  //       throw new HttpException(`User id:${userId} don't found`, HttpStatus.BAD_REQUEST);
-  //     }
-
-  //     if (userExists.mediaAvatar) {
-
-
-
-  //       if (mediaDeleted) {
-  //         return await this.create(userId, data)
-  //       }        
-  //     }
-  //   } catch (err) {
-  //     if (err.driverError) {
-  //       return err.driverError
-  //     } else {
-  //       console.log(err, 'err')
-  //       return err
-  //     }
-  //   }
-  // }
+  }  
 }
 

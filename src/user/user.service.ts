@@ -54,19 +54,15 @@ export class UserService {
       user.userName = createUserDto.userName
       user.realName = createUserDto.realName
       user.email = createUserDto.email
+      user.dateOfBirth = createUserDto.dateOfBirth
       user.emailCode = Math.floor(Math.random() * 9000) + 1000;
       user.password = bcrypt.hashSync(createUserDto.password, 8)    
 
       const userCreated = await this.userRepository.save(user);      
 
-      if(userCreated && createUserDto.mediaAvatar){
+      if(userCreated && createUserDto.mediaAvatar){ 
 
-        let teste = []
-        teste.push(createUserDto.mediaAvatar)
-
-        for await (const a of teste){
-          await this.mediaAvatarService.create( userCreated.id, a)  
-        }
+        await this.mediaAvatarService.create( userCreated.id, createUserDto.mediaAvatar)       
 
         return await this.userRepository.findOne({ where: { id: userCreated.id }, relations: ['mediaAvatar'] })
                         
@@ -96,6 +92,7 @@ export class UserService {
       if (!orderBy) orderBy = 'DESC';
 
       const [users, total] = await this.userRepository.findAndCount({
+        relations: ['mediaAvatar'],
         skip: take * (page - 1),
         take,
         order: { id: orderBy },
@@ -141,7 +138,7 @@ export class UserService {
       }
 
       if (query.userName) {
-        const userExists = await this.userRepository.findOne({ where: { userName: query.userName } })
+        const userExists = await this.userRepository.findOne({ where: { userName: query.userName }, relations: ['mediaAvatar'] })
 
         if (!userExists) {
           throw new HttpException(`User ${query.userName} don't found`, HttpStatus.BAD_REQUEST);
@@ -150,7 +147,7 @@ export class UserService {
         return userExists
       }
       if (query.email) {
-        const userExists = await this.userRepository.findOne({ where: { email: query.email } })
+        const userExists = await this.userRepository.findOne({ where: { email: query.email }, relations: ['mediaAvatar'] })
 
         if (!userExists) {
           throw new HttpException(`User ${query.email} don't found`, HttpStatus.BAD_REQUEST);
@@ -255,9 +252,20 @@ export class UserService {
             realizando uma atualização de cadastro`
           }
           )
-        }
+        }  
+        
+        if(userUpdate.qtdTryingSendEmail === 3 ){// in 3 time try send email its return new password if front must return a push local or push firebase
 
-        if(userUpdate.qtdTryingSendEmail === 3 ){
+          let userUpdate = {
+            password : data.password,
+            qtdTryingSendEmail: 0
+          }        
+  
+          const updatePassword = await this.userRepository.save({
+            ...userUpdate,
+            id: Number(userExists.id),
+          });
+
           return {passord:newPassword}
         }
       }

@@ -9,9 +9,10 @@ import { PaginatedUserDto } from './dto/paginated-user.dto';
 import { User } from './entities/user.entity';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { MediaAvatarService } from 'src/media-avatar/media-avatar.service';
+import { ApiTags, ApiQuery, ApiResponse } from '@nestjs/swagger';
 
 
-
+@ApiTags('user')
 @Controller('user')
 export class UserController {
   constructor(
@@ -39,6 +40,9 @@ export class UserController {
 
   //@UseGuards(JwtAuthGuard)
   @Get('getByFilter/:userId')
+  @ApiQuery({ name: 'query userName', description: 'Filter products by name', required: false })
+  @ApiQuery({ name: 'query email', description: 'Filter products by email', required: false })
+  @ApiResponse({ status: 200, description: 'Return user by filter sended' })
   async getByFilter(@Param('userId') userId: number,@Query() query): Promise<User> {
     return await this.userService.getByFilter(userId,query)
   }
