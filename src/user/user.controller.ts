@@ -9,7 +9,7 @@ import { PaginatedUserDto } from './dto/paginated-user.dto';
 import { User } from './entities/user.entity';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { MediaAvatarService } from 'src/media-avatar/media-avatar.service';
-import { ApiTags, ApiQuery, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiQuery, ApiResponse, ApiOperation } from '@nestjs/swagger';
 
 
 @ApiTags('user')
@@ -21,18 +21,35 @@ export class UserController {
     private mediaAvatarService : MediaAvatarService
   ) {}
   
+  @ApiOperation({
+    summary: 'Create a user account',
+    description: `create a user account , 
+    if sended avatar object too he add avatar, but if don't sended he create a user without avatar image, 
+    if wrong err with image avatar he make user without avatar, the avatar image will upload in the 'STORAGE' and save only url in data base `,
+    tags: ['user'],
+  })
   @Post()
   create(@Body() createUserDto: CreateUserDto) {    
     return this.userService.create(createUserDto);
   }
 
   //@UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Get all registered users',
+    description: `Get all registered users, return user list paginated`,
+    tags: ['user'],
+  })
   @Get()
   async getAllUsers(@Query() query: { page: number; take: number; orderBy: 'ASC' | 'DESC' }): Promise<PaginatedUserDto> {    
     return await this.userService.getAllUsers(query);
   }
 
   //@UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'Receive param: user id ',
+    description: `Get user owner id sended param`,
+    tags: ['user'],
+  })
   @Get(':userId')
   getUserById(@Param('userId') userId: number) {
     return this.userService.getUserById(userId);
@@ -40,6 +57,11 @@ export class UserController {
 
   //@UseGuards(JwtAuthGuard)
   @Get('getByFilter/:userId')
+  @ApiOperation({
+    summary: 'Receive param : user id, query param : email or userName => url/user/userId?email=a@email.com',
+    description: `Get user owner email or userName by filter query`,
+    tags: ['user'],
+  })
   @ApiQuery({ name: 'query userName', description: 'Filter products by name', required: false })
   @ApiQuery({ name: 'query email', description: 'Filter products by email', required: false })
   @ApiResponse({ status: 200, description: 'Return user by filter sended' })
@@ -48,37 +70,48 @@ export class UserController {
   }
 
   //@UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'update by param : user id',
+    description: `Update user data, that can to be modifications`,
+    tags: ['user'],
+  })
   @Patch(':userId')
   updateUser(@Param('userId') userId: number, @Body() updateUserDto: UpdateUserDto) {
     return this.userService.updateUser(userId, updateUserDto);
   }
 
   //@UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    summary: 'remove user by param : user id',
+    description: `remove user data`,
+    tags: ['user'],
+  })
   @Delete(':userId')
   remove(@Param('userId') userId: number) {
     return this.userService.removeUser(userId);
   }
 
   @UseGuards(AuthGuard('local'))
+  @ApiOperation({
+    summary: 'realize sign in user by body params',
+    description: `user send email and password, in the body params`,
+    tags: ['user'],
+  })
   @Post('login')
   async login(@Request() req) {    
     return this.authService.login(req.user);
   }
 
   @Post('forgetedOrUpdatePassword')
+  @ApiOperation({
+    summary: 'update, and too when user forget password',
+    description: `send params by body, if send password he will do update password, 
+    if don't send passowrd on body he send code in the email , 
+    subscribled in user account, 3 time tryed send code he return the code for show user of appropriate modo `,
+    tags: ['user'],
+  })
   forgetedOrUpdatePassword(@Body() data:UpdateUserPasswordDto) {    
     return this.userService.forgetedOrUpdatePassword(data);
-  }
-
-  //@UseGuards(JwtAuthGuard)
-  // @Delete('/a/a/a/a')
-  // async deleteMediaAvatar() {
-  //   return await this.mediaAvatarService.deleteMedia();
-  // }
-
-  // @Get('a/a/a/a/a')
-  // a(){
-  //   return this.userService.a();
-  // }
+  } 
 
 }

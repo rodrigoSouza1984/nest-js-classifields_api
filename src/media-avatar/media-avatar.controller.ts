@@ -12,16 +12,22 @@ export class MediaAvatarController {
   //@UseGuards(JwtAuthGuard)
   @Post('/:userId')
   @ApiOperation({
-    summary: 'param will receive userId of avatar owner',
-    description: 'if user don t have avatar still, he will add avatar in user, if user have avatar its make a update changing your avatar',
+    summary: 'param will receive user id of avatar owner',
+    description: `if user don t have avatar still, he will add avatar in user, 
+    if user have avatar its make a update changing your avatar, this image file upload STORAGE and url in th data base only`,
     tags: ['media-avatar'],
   })
   async create(@Param('userId') userId: number, @Body() mediaAvatarDto: MediaAvatarDto) {
     return await this.mediaAvatarService.create(userId,mediaAvatarDto);
   }    
 
-  //@UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)  
   @Delete('/:userId/:fileName')
+  @ApiOperation({
+    summary: 'param will receive user id avatar owner and file name media',
+    description: `remove media data of data base, and remove in the STORAGE too media uploaded`,
+    tags: ['media-avatar'],
+  })
   async deleteMediaAvatar(@Param('userId') userId: number, @Param('fileName') fileName: string) {
     return await this.mediaAvatarService.deleteMedia(userId,fileName);
   }

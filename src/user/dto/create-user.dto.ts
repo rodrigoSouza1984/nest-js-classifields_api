@@ -46,7 +46,7 @@ export class CreateUserDto {
     @ApiProperty({
         description: `NO REQUIRED ENTITY RELATION ONE TO ONE WITH USER , ITS IMAGE AVATAR OF USER `,
         type: Object,
-        example: 'OBJECT',
+        example: 'OBJECT MediaAvatarDto',
     })
     mediaAvatar?: MediaAvatarEntity;
 }

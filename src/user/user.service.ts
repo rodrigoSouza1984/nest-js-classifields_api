@@ -221,6 +221,10 @@ export class UserService {
 
       if (data.password) {
 
+        if (data.password !== data.confirmPassword) {
+          throw new HttpException(`Password and confirmPassword must to be equals!`, HttpStatus.BAD_REQUEST);
+        } 
+
         data.password = bcrypt.hashSync(data.password, 8)
 
         return await this.userRepository.save({
