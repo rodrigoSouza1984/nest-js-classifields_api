@@ -13,6 +13,7 @@ import { EmailSendService } from 'src/email-send/email-send.service';
 
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { MediaAvatarService } from 'src/media-avatar/media-avatar.service';
+import * as crypto from 'crypto';
 
 //import { MediaAvatarService } from './media-avatar.service';
 
@@ -47,7 +48,7 @@ export class UserService {
 
       if (createUserDto.password !== createUserDto.confirmPassword) {
         throw new HttpException(`Password and confirmPassword must to be equals!`, HttpStatus.BAD_REQUEST);
-      } 
+      }
 
       const user = new User()
 
@@ -56,19 +57,19 @@ export class UserService {
       user.email = createUserDto.email
       user.dateOfBirth = createUserDto.dateOfBirth
       user.emailCode = Math.floor(Math.random() * 9000) + 1000;
-      user.password = bcrypt.hashSync(createUserDto.password, 8)    
+      user.password = bcrypt.hashSync(createUserDto.password, 8)
 
-      const userCreated = await this.userRepository.save(user);      
+      const userCreated = await this.userRepository.save(user)
 
-      if(userCreated && createUserDto.mediaAvatar){ 
+      if (userCreated && createUserDto.mediaAvatar) {
 
-        await this.mediaAvatarService.create( userCreated.id, createUserDto.mediaAvatar)       
+        await this.mediaAvatarService.create(userCreated.id, createUserDto.mediaAvatar)
 
         return await this.userRepository.findOne({ where: { id: userCreated.id }, relations: ['mediaAvatar'] })
-                        
-      }else{
+
+      } else {
         return userCreated
-      }     
+      }
 
       // if(userCreated){
       //   await this.emailSendService.sendEmail(user.email, {emailCode: user.emailCode, subject: 'Criação do Usuário no Apk Classifields'})
@@ -76,9 +77,84 @@ export class UserService {
 
     } catch (err) {
       if (err.driverError) {
-        return err.driverError
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
       } else {
-        return err
+        throw err
+      }
+    }
+  }
+
+  async createUserNameUnique(userName: string) {
+    try {
+      const userExists = await this.userRepository.findOne({ where: { userName: userName } });
+
+      if (userExists) {
+
+        let namesOptions = []
+
+        const namesGenerateds = await this.generatorUserName(userName)
+
+        for await (const name of namesGenerateds) {
+          const userExistsToo = await this.userRepository.findOne({ where: { userName: name } });
+
+          if (!userExistsToo) {
+            namesOptions.push(name)
+          }
+        }
+
+        if (namesOptions.length > 0) {
+          return namesOptions
+        } else {
+          let namesOptions = []
+
+          const namesGenerateds = await this.generatorUserName(userName)
+
+          for await (const name of namesGenerateds) {
+            const userExistsToo = await this.userRepository.findOne({ where: { userName: name } });
+
+            if (!userExistsToo) {
+              namesOptions.push(name)
+            }
+
+            return namesOptions
+          }
+        }
+      } else {
+
+        return userName
+
+      }
+
+    } catch (err) {
+      if (err.driverError) {
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
+      } else {
+        throw err
+      }
+    }
+  }
+
+  async generatorUserName(userName: string) {
+    try {
+
+      const hash = crypto.createHash('sha256');
+
+      let prefix1 = `${userName}`
+      let timestampName1 = new Date().getTime().toString();
+      hash.update(prefix1 + timestampName1)
+      let codeGenerated = hash.digest('hex').substring(0, 6)
+
+      let name1 = `${prefix1}@${codeGenerated}`;
+      let name2 = `${prefix1}_${codeGenerated}`;
+      let name3 = `${prefix1}${codeGenerated}`;
+
+      return [name1, name2, name3]
+
+    } catch (err) {
+      if (err.driverError) {
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
+      } else {
+        throw err
       }
     }
   }
@@ -102,9 +178,9 @@ export class UserService {
 
     } catch (err) {
       if (err.driverError) {
-        return err.driverError
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
       } else {
-        return err
+        throw err
       }
     }
   }
@@ -121,9 +197,9 @@ export class UserService {
 
     } catch (err) {
       if (err.driverError) {
-        return err.driverError
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
       } else {
-        return err
+        throw err
       }
     }
   }
@@ -158,9 +234,9 @@ export class UserService {
 
     } catch (err) {
       if (err.driverError) {
-        return err.driverError
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
       } else {
-        return err
+        throw err
       }
     }
   }
@@ -180,9 +256,9 @@ export class UserService {
 
     } catch (err) {
       if (err.driverError) {
-        return err.driverError
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
       } else {
-        return err
+        throw err
       }
     }
   }
@@ -199,9 +275,9 @@ export class UserService {
 
     } catch (err) {
       if (err.driverError) {
-        return err.driverError
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
       } else {
-        return err
+        throw err
       }
     }
   }
@@ -223,7 +299,7 @@ export class UserService {
 
         if (data.password !== data.confirmPassword) {
           throw new HttpException(`Password and confirmPassword must to be equals!`, HttpStatus.BAD_REQUEST);
-        } 
+        }
 
         data.password = bcrypt.hashSync(data.password, 8)
 
@@ -237,9 +313,9 @@ export class UserService {
         data.password = bcrypt.hashSync(newPassword, 8)
 
         let userUpdate = {
-          password : data.password,
+          password: data.password,
           qtdTryingSendEmail: userExists.qtdTryingSendEmail + 1
-        }        
+        }
 
         const updatePassword = await this.userRepository.save({
           ...userUpdate,
@@ -256,29 +332,29 @@ export class UserService {
             realizando uma atualização de cadastro`
           }
           )
-        }  
-        
-        if(userUpdate.qtdTryingSendEmail === 3 ){// in 3 time try send email its return new password if front must return a push local or push firebase
+        }
+
+        if (userUpdate.qtdTryingSendEmail === 3) {// in 3 time try send email its return new password if front must return a push local or push firebase
 
           let userUpdate = {
-            password : data.password,
+            password: data.password,
             qtdTryingSendEmail: 0
-          }        
-  
+          }
+
           const updatePassword = await this.userRepository.save({
             ...userUpdate,
             id: Number(userExists.id),
           });
 
-          return {passord:newPassword}
+          return { passord: newPassword }
         }
       }
 
     } catch (err) {
       if (err.driverError) {
-        return err.driverError
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
       } else {
-        return err
+        throw err
       }
     }
   }
@@ -286,6 +362,6 @@ export class UserService {
   //FOR USE IN LOGIN AUTHSERVICE
   async findOne(email: string): Promise<User | undefined> {
     return this.userRepository.findOne({ where: { email: email } });
-  }  
- 
+  }
+
 }

@@ -1,5 +1,6 @@
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, Generated, JoinColumn, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, Generated, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { MediaAvatarEntity } from "../../media-avatar/entities/media-avatar.entity";
+import { ProductEntity } from "src/product/entities/product.entity";
 
 export enum UserStatusEnum {
     ACTIVE = 'active',
@@ -49,12 +50,17 @@ export class User {
         enum: TypePermissionEnum,
         default: TypePermissionEnum.USER,
     })
-    type: TypePermissionEnum;
+    typePermissionEnum: TypePermissionEnum;
 
     @OneToOne(() => MediaAvatarEntity, (mediaAvatar) => mediaAvatar.user, {
         cascade: true,
     })
     mediaAvatar: MediaAvatarEntity;
+
+    @OneToMany(() => ProductEntity, (productEntity) => productEntity.user, {
+        cascade: true,
+    })
+    products: ProductEntity[];
 
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;

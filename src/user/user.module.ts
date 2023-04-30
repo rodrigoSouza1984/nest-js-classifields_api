@@ -7,11 +7,12 @@ import { AuthModule } from 'src/auth/auth.module';
 import { EmailSendService } from 'src/email-send/email-send.service';
 import { MediaAvatarEntity } from '../media-avatar/entities/media-avatar.entity';
 import { MediaAvatarService } from 'src/media-avatar/media-avatar.service';
+import { ProductEntity } from 'src/product/entities/product.entity';
 
 
 @Global()
 @Module({
-  imports: [TypeOrmModule.forFeature([User, MediaAvatarEntity]), AuthModule],
+  imports: [TypeOrmModule.forFeature([User, MediaAvatarEntity, ProductEntity]), AuthModule],
   exports: [TypeOrmModule, UserService],
   controllers: [UserController],
   providers: [UserService, EmailSendService, MediaAvatarService]

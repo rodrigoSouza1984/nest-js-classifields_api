@@ -9,9 +9,10 @@ import { jwtConstants } from './constants';
 import { UserService } from 'src/user/user.service';
 import { EmailSendService } from 'src/email-send/email-send.service';
 import { MediaAvatarService } from 'src/media-avatar/media-avatar.service';
+import { TokenModule } from 'src/token/token.module';
 
 @Module({
-  imports: [forwardRef(()=>UserModule),PassportModule,
+  imports: [forwardRef(()=>UserModule),PassportModule, TokenModule,
     JwtModule.register({
       secret: jwtConstants.secret,
       signOptions: { expiresIn: '30000s' },

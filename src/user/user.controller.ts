@@ -55,6 +55,16 @@ export class UserController {
     return this.userService.getUserById(userId);
   }    
 
+  @ApiOperation({
+    summary: 'Receive param: user name ',
+    description: `Receive in the param the userName realize the get by userName, if exists already user with this user name he return 3 options name, if don't exists userName return userName sended`,
+    tags: ['user'],
+  })
+  @Get('createUserNameUnique/:userName')
+  createUserNameUnique(@Param('userName') userName: string) {
+    return this.userService.createUserNameUnique(userName);
+  } 
+
   //@UseGuards(JwtAuthGuard)
   @Get('getByFilter/:userId')
   @ApiOperation({

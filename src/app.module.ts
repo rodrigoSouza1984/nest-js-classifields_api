@@ -7,6 +7,8 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { EmailSendModule } from './email-send/email-send.module';
 import { MediaAvatarModule } from './media-avatar/media-avatar.module';
+import { TokenModule } from './token/token.module';
+import { ProductModule } from './product/product.module';
 
 
 
@@ -32,7 +34,9 @@ import { MediaAvatarModule } from './media-avatar/media-avatar.module';
     UserModule,
     AuthModule,
     EmailSendModule,
-    MediaAvatarModule
+    MediaAvatarModule,
+    TokenModule,
+    ProductModule
   ],
   controllers: [AppController],
   providers: [AppService],

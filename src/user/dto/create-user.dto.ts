@@ -1,5 +1,7 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { MediaAvatarEntity } from "../../media-avatar/entities/media-avatar.entity";
+import { TypePermissionEnum } from "../entities/user.entity";
+import { ProductEntity } from "src/product/entities/product.entity";
 
 export class CreateUserDto {    
     @ApiProperty({
@@ -42,11 +44,17 @@ export class CreateUserDto {
     dateOfBirth: string;
 
     emailCode?: number;
+
+    @ApiProperty({
+        description: 'type permission that user have, enum [admin, user], default is user',
+        example: 'admin'
+    })
+    typePermissionEnum?: TypePermissionEnum;
     
     @ApiProperty({
         description: `NO REQUIRED ENTITY RELATION ONE TO ONE WITH USER , ITS IMAGE AVATAR OF USER `,
         type: Object,
         example: 'OBJECT MediaAvatarDto',
     })
-    mediaAvatar?: MediaAvatarEntity;
+    mediaAvatar?: MediaAvatarEntity;    
 }
