@@ -84,7 +84,7 @@ export class UserService {
     }
   }
 
-  async createUserNameUnique(userName: string) {
+  async createUserNameUnique(userName: string) {//make some options to user can use how your username 
     try {
       const userExists = await this.userRepository.findOne({ where: { userName: userName } });
 

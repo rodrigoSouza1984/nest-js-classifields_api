@@ -1,11 +1,98 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { ProductEntity } from './entities/product.entity';
+import { Repository } from 'typeorm';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class ProductService {
-  create(createProductDto: CreateProductDto) {
-    return 'This action adds a new product';
+
+  constructor(
+    @InjectRepository(ProductEntity) private productRepository: Repository<ProductEntity>,
+    @InjectRepository(User) private userRepository: Repository<User>,
+  ) { }
+
+  async create(ownerUserId: number, createProductDto: CreateProductDto) {
+    try {
+
+      if (createProductDto.title === '' || createProductDto.title === undefined ||
+        createProductDto.ownerRealName === '' || createProductDto.ownerRealName === undefined ||
+        createProductDto.ownerEmail === '' || createProductDto.ownerEmail === undefined ||
+        createProductDto.ownerContactPhone === '' || createProductDto.ownerContactPhone === undefined ||
+        createProductDto.description === '' || createProductDto.description === undefined ||
+        createProductDto.typeProductEnum === null || createProductDto.typeProductEnum === undefined ||
+        createProductDto.street === '' || createProductDto.street === undefined ||
+        createProductDto.neighborhood === '' || createProductDto.neighborhood === undefined ||
+        createProductDto.postalCode === null || createProductDto.neighborhood === undefined ||
+        createProductDto.number === null || createProductDto.number === undefined ||
+        createProductDto.city === '' || createProductDto.city === undefined ||
+        createProductDto.state === '' || createProductDto.state === undefined
+      ) {
+        throw new HttpException(`Title, ownerRealName, ownerEmail, ownerContactPhone,
+        dailyValue, description, typeProductEnum, street, neighborhood, postalCode, 
+        city, state number must be sended!`, HttpStatus.BAD_REQUEST);
+      }
+      
+      let dailyValueEmpty = false
+      let valuePerMonthEmpty = false
+
+      if (createProductDto.dailyValue === null || createProductDto.dailyValue === undefined) {
+        dailyValueEmpty = true
+      }
+      
+      if(createProductDto.valuePerMonth === null || createProductDto.valuePerMonth === undefined){
+        valuePerMonthEmpty = true
+      }
+
+      if (dailyValueEmpty === true && valuePerMonthEmpty === true) {
+        throw new HttpException(`daily value or value per month must be sended!`, HttpStatus.BAD_REQUEST);
+      }
+
+      const userExists = await this.userRepository.findOne({ where: { id: ownerUserId } })
+
+      if (!userExists) {
+        throw new HttpException(`User don't found!`, HttpStatus.NOT_FOUND);
+      }
+
+      if (userExists.email !== createProductDto.ownerEmail) {
+        throw new HttpException(`Email sended must be the same of register user!`, HttpStatus.BAD_REQUEST);
+      }
+
+      if (userExists.realName !== createProductDto.ownerRealName) {
+        throw new HttpException(`Real name sended must be the same of register user!`, HttpStatus.BAD_REQUEST);
+      }
+
+      const product = new ProductEntity()
+
+      product.ownerRealName = createProductDto.ownerRealName
+      product.ownerEmailContact = createProductDto.ownerEmail
+      product.ownerContactPhone = createProductDto.ownerContactPhone
+      product.title = createProductDto.title
+      product.description = createProductDto.description
+      product.dailyValue = createProductDto.dailyValue
+      product.typeProductEnum = createProductDto.typeProductEnum
+      product.street = createProductDto.street
+      product.neighborhood = createProductDto.neighborhood
+      product.complement = createProductDto.complement
+      product.number = createProductDto.number
+      product.city = createProductDto.city
+      product.state = createProductDto.state
+      product.postalCode = createProductDto.postalCode
+      product.user = userExists
+
+      const productCreated = await this.productRepository.save(product)
+
+      return productCreated
+
+    } catch (err) {
+      if (err.driverError) {
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
+      } else {
+        throw err
+      }
+    }
   }
 
   findAll() {

@@ -4,6 +4,8 @@ import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, PrimaryG
 export enum TypeProductEnum {
     FARM = 'farm',
     PARTYHALL = 'partyHall',
+    HOUSE = 'house',
+    APARTMENT = 'apartment'
 }
 
 @Entity()
@@ -12,32 +14,41 @@ export class ProductEntity {
     @PrimaryGeneratedColumn()
     id: number
 
-    @Column({ nullable: false })
+    @Column({ nullable: true })
     ownerRealName: string;    
 
-    @Column({ nullable: false })
+    @Column({ nullable: true })
     ownerEmailContact: string;
 
-    @Column({ nullable: false })
+    @Column({ nullable: true })
     ownerContactPhone: string;
 
-    @Column({ nullable: false })
+    @Column({ nullable: true })
     title: string;
 
-    @Column({ unique: true, nullable: false })
+    @Column({ nullable: true })
     description: string;
 
-    @Column({ unique: true, nullable: false })
-    dailyValue: string;
+    @Column({ nullable: true })
+    dailyValue: number;    
 
-    @Column({ nullable: false })
+    @Column({ nullable: true })
+    valuePerMonth: number;
+
+    @Column({ nullable: true })
     street: string;    
 
     @Column({ nullable: true })
     neighborhood: string;
 
-    @Column()
+    @Column({ nullable: true })
     complement: string;
+
+    @Column({ nullable: true })
+    city: string;
+
+    @Column({ nullable: true })
+    state: string;
 
     @Column({ default: 0 })
     number: number;   

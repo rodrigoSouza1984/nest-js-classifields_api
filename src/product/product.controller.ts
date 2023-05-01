@@ -7,9 +7,9 @@ import { UpdateProductDto } from './dto/update-product.dto';
 export class ProductController {
   constructor(private readonly productService: ProductService) {}
 
-  @Post()
-  create(@Body() createProductDto: CreateProductDto) {
-    return this.productService.create(createProductDto);
+  @Post(':ownerUserId')
+  create(@Param('ownerUserId') ownerUserId: number ,@Body() createProductDto: CreateProductDto) {
+    return this.productService.create(ownerUserId,createProductDto);
   }
 
   @Get()

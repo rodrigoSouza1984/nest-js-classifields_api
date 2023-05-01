@@ -35,10 +35,16 @@ export class CreateProductDto {
     description?: string;
 
     @ApiProperty({
-        description: 'REQUIRED - Price daily your announcement',
+        description: 'REQUIRED "dailyValue or valuePerMonth" - Price daily your announcement, value sended at cents',
         example: 'R$100,00 ....'
     }) 
-    dailyValue?: string;
+    dailyValue?: number;   
+
+    @ApiProperty({
+        description: 'REQUIRED "dailyValue or valuePerMonth" - Price per month your announcement, value sended at cents',
+        example: 'R$1000,00 ....'
+    })
+    valuePerMonth?: number;
 
     @ApiProperty({
         description: 'REQUIRED - Street local where your announcement stay localizaded',
@@ -53,16 +59,28 @@ export class CreateProductDto {
     neighborhood?: string;
 
     @ApiProperty({
-        description: 'NO REQUIRED - Complement about your neighborhood or street etc, that your announcement stay on the street',
+        description: 'REQUIRED - Complement about your neighborhood or street etc, that your announcement stay on the street',
         example: 'Bloc xx Apartment x....'
     }) 
     complement?: string;
 
     @ApiProperty({
-        description: 'NO REQUIRED - Number that your announcement stay on the street  ',
+        description: 'REQUIRED - Number that your announcement stay on the street  ',
         example: '122'
     }) 
     number?: number;  
+
+    @ApiProperty({
+        description: 'REQUIRED - City of your announcement stay',
+        example: 'xxxxxx....'
+    }) 
+    city?: string;
+
+    @ApiProperty({
+        description: 'REQUIRED - State of your announcement stay',
+        example: 'xx....'
+    }) 
+    state?: string;
     
     @ApiProperty({
         description: 'REQUIRED  - Postal code your announcement',
@@ -71,7 +89,7 @@ export class CreateProductDto {
     postalCode?: number; 
 
     @ApiProperty({
-        description: 'REQUIRED - Kind product of announcement - enum = [farm, partyHall]',
+        description: 'REQUIRED - Kind product of announcement - enum = [ farm, partyHall, house, apartment ]',
         example: 'xx-xxx-xxx'
     })
     typeProductEnum?: TypeProductEnum;
@@ -81,5 +99,4 @@ export class CreateProductDto {
         example: '{url}/xxxx/userId'
     })
     user?: User;
-
 }
