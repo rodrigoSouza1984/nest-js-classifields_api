@@ -6,6 +6,7 @@ import { ProductEntity } from 'src/product/entities/product.entity';
 import { Repository } from 'typeorm';
 import { ProductMediaEntity } from './entities/product-media.entity';
 import index from '../common/firebase';
+import { User } from 'src/user/entities/user.entity';
 
 @Injectable()
 export class ProductMediaService {
@@ -13,19 +14,34 @@ export class ProductMediaService {
   constructor(
     @InjectRepository(ProductEntity) private productRepository: Repository<ProductEntity>,
     @InjectRepository(ProductMediaEntity) private productMediaRepository: Repository<ProductMediaEntity>,
+    @InjectRepository(User) private userRepository: Repository<User>,
   ) { }
 
 
   async addMediasProduct(userId: number, productId: number, dataBody: CreateProductMediaDto[]) {
     try {
 
-      if(dataBody.length > 5){
+      if (dataBody.length > 5) {
         throw new HttpException(`Have more than 5 medias at body, maximun 5 medias`, HttpStatus.BAD_REQUEST);
+      }
+
+      const userExists = await this.userRepository.findOne({ where: { id: userId }, relations: ['mediaAvatar'] })
+
+      if (!userExists) {
+        throw new HttpException(`User not found! userId:${userId}`, HttpStatus.NOT_FOUND);
       }
 
       const productExists = await this.productRepository.findOne({ where: { id: productId }, relations: ['mediasProduct'] })
 
-      if(productExists.mediasProduct.length + dataBody.length > 5){
+      if (!productExists) {
+        throw new HttpException(`Product not found! productId:${productId}`, HttpStatus.NOT_FOUND);
+      }
+
+      if (!productExists) {
+        throw new HttpException(`Product not found! productId:${productId}`, HttpStatus.NOT_FOUND);
+      }
+
+      if (productExists.mediasProduct.length + dataBody.length > 5) {
         throw new HttpException(`Maximun 5 medias will have more than 5 medias with this add, already have ${productExists.mediasProduct.length} add at your product `, HttpStatus.BAD_REQUEST);
       }
 
@@ -68,6 +84,47 @@ export class ProductMediaService {
 
       return await this.productRepository.findOne({ where: { id: productId }, relations: ['mediasProduct'] })
 
+
+    } catch (err) {
+      if (err.driverError) {
+        return err.driverError
+      } else {
+        console.log(err, 'err')
+        return err
+      }
+    }
+  }
+
+  async deleteMediasProduct(userId: number, productId: number, mediasId: number[]) {
+    try {
+
+      const userExists = await this.userRepository.findOne({ where: { id: userId }, relations: ['mediaAvatar'] })
+
+      if (!userExists) {
+        throw new HttpException(`User not found! userId:${userId}`, HttpStatus.NOT_FOUND);
+      }
+
+      const productExists = await this.productRepository.findOne({ where: { id: productId }, relations: ['mediasProduct'] })
+
+      if (!productExists) {
+        throw new HttpException(`Product not found! productId:${productId}`, HttpStatus.NOT_FOUND);
+      }
+
+      for await (const id of mediasId) {
+
+        const mediaExists = await productExists.mediasProduct.find(r => r.id === id)
+
+        const filePath = `classifields/users/${userId}/products/${productExists.id}/${mediaExists.name}`
+
+        const deletedBucket = await index.deleteMediaToFirebaseStorage(filePath)
+
+        if (deletedBucket) {
+          await this.productMediaRepository.delete(id)
+        }
+
+      }
+      
+      return true
 
     } catch (err) {
       if (err.driverError) {

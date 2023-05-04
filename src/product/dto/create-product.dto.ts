@@ -1,6 +1,7 @@
 import { User } from "src/user/entities/user.entity";
 import { TypeProductEnum } from "../entities/product.entity";
 import { ApiProperty } from "@nestjs/swagger";
+import { ProductMediaEntity } from "src/product-media/entities/product-media.entity";
 
 export class CreateProductDto {
 
@@ -93,6 +94,12 @@ export class CreateProductDto {
         example: 'xx-xxx-xxx'
     })
     typeProductEnum?: TypeProductEnum;
+
+    @ApiProperty({
+        description: 'REQUIRED - Medias about your product minimum 1 maximum 5]',
+        example: 'mediasProduct: [{create-product-media.dto}]'
+    })
+    mediasProduct?: ProductMediaEntity[]
 
     @ApiProperty({
         description: 'REQUIRED - User owner of announcement, send by param this property ',

@@ -12,6 +12,11 @@ export class ProductController {
     return this.productService.create(ownerUserId,createProductDto);
   }
 
+  @Delete(':ownerUserId/:productId')
+  remove(@Param('ownerUserId') ownerUserId: number, @Param('productId') productId: number,) {
+    return this.productService.delete(ownerUserId, productId);
+  }
+
   @Get()
   findAll() {
     return this.productService.findAll();
@@ -27,8 +32,5 @@ export class ProductController {
     return this.productService.update(+id, updateProductDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.productService.remove(+id);
-  }
+  
 }

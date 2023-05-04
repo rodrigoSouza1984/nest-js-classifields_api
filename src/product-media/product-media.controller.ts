@@ -11,6 +11,11 @@ export class ProductMediaController {
   addMediasProduct(@Param('userId') userId: number,@Param('productId') productId: number,@Body() dataBody: CreateProductMediaDto[]) {
     return this.productMediaService.addMediasProduct(userId,productId,dataBody);
   }
+  
+  @Delete('/:userId/:productId')
+  deleteMediasProduct(@Param('userId') userId: number,@Param('productId') productId: number,@Body() mediasId: number[]) {
+    return this.productMediaService.deleteMediasProduct(userId,productId,mediasId);
+  }
 
   @Get()
   findAll() {
