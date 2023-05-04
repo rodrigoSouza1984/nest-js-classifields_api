@@ -2,7 +2,7 @@ import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, OneToOn
 import { User } from '../../user/entities/user.entity'
 
 @Entity()
-export class MediaAvatarEntity {
+export class UserMediaAvatarEntity {
 
     @PrimaryGeneratedColumn()
     id: number;

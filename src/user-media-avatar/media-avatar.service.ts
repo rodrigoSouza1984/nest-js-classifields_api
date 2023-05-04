@@ -1,8 +1,8 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { MediaAvatarEntity } from '../media-avatar/entities/media-avatar.entity';
-import { MediaAvatarDto } from '../media-avatar/dto/media-avatar.dto';
+import { UserMediaAvatarEntity } from '../user-media-avatar/entities/media-avatar.entity';
+import { MediaAvatarDto } from '../user-media-avatar/dto/media-avatar.dto';
 import { HttpException } from '@nestjs/common/exceptions';
 import { HttpStatus } from '@nestjs/common/enums';
 import index from '../common/firebase';
@@ -13,7 +13,7 @@ export class MediaAvatarService {
 
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
-    @InjectRepository(MediaAvatarEntity) private mediaAvatarRepository: Repository<MediaAvatarEntity>,
+    @InjectRepository(UserMediaAvatarEntity) private userMediaAvatarRepository: Repository<UserMediaAvatarEntity>,
   ) { }
 
   async create(userId: number, data: MediaAvatarDto): Promise<User> {
@@ -25,7 +25,7 @@ export class MediaAvatarService {
         const mediaDeleted = await this.deleteMedia(userExists.id, userExists.mediaAvatar.name)        
       }
 
-      const mediaExists = await this.mediaAvatarRepository.findOne({ where: { name: data.name } })
+      const mediaExists = await this.userMediaAvatarRepository.findOne({ where: { name: data.name } })
 
       if (mediaExists) {
         throw new HttpException(`Media with this name, already there are only file with unique name name: ${data.name}`, HttpStatus.BAD_REQUEST);
@@ -50,14 +50,14 @@ export class MediaAvatarService {
       if (!url) {
         throw new HttpException(`Avatar don't created there are some wrong in the bucket no returned url`, HttpStatus.BAD_REQUEST);
       } else {
-        const media = new MediaAvatarEntity()
+        const media = new UserMediaAvatarEntity()
 
         media.name = data.name
         media.mimeType = data.mimeType
         media.url = url.toString()
         media.user = userExists
 
-        await this.mediaAvatarRepository.save(media)
+        await this.userMediaAvatarRepository.save(media)
 
         return await this.userRepository.findOne({ where: { id: userId }, relations: ['mediaAvatar'] })
       }
@@ -85,7 +85,7 @@ export class MediaAvatarService {
       const deletedBucket = await index.deleteMediaToFirebaseStorage(filePath)
 
       if (deletedBucket) {
-        await this.mediaAvatarRepository.delete(userExists.mediaAvatar.id)
+        await this.userMediaAvatarRepository.delete(userExists.mediaAvatar.id)
 
         return true
       }

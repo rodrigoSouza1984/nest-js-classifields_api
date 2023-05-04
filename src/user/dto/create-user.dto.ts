@@ -1,7 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { MediaAvatarEntity } from "../../media-avatar/entities/media-avatar.entity";
+import { UserMediaAvatarEntity } from "../../user-media-avatar/entities/media-avatar.entity";
 import { TypePermissionEnum } from "../entities/user.entity";
-import { ProductEntity } from "src/product/entities/product.entity";
 
 export class CreateUserDto {    
     @ApiProperty({
@@ -56,5 +55,5 @@ export class CreateUserDto {
         type: Object,
         example: 'OBJECT MediaAvatarDto',
     })
-    mediaAvatar?: MediaAvatarEntity;    
+    mediaAvatar?: UserMediaAvatarEntity;    
 }

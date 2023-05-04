@@ -12,7 +12,7 @@ import { PaginatedUserDto } from './dto/paginated-user.dto';
 import { EmailSendService } from 'src/email-send/email-send.service';
 
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
-import { MediaAvatarService } from 'src/media-avatar/media-avatar.service';
+import { MediaAvatarService } from 'src/user-media-avatar/media-avatar.service';
 import * as crypto from 'crypto';
 
 //import { MediaAvatarService } from './media-avatar.service';

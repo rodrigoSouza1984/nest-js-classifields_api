@@ -6,9 +6,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { EmailSendModule } from './email-send/email-send.module';
-import { MediaAvatarModule } from './media-avatar/media-avatar.module';
+import { MediaAvatarModule } from './user-media-avatar/media-avatar.module';
 import { TokenModule } from './token/token.module';
 import { ProductModule } from './product/product.module';
+import { ProductMediaModule } from './product-media/product-media.module';
 
 
 
@@ -36,7 +37,8 @@ import { ProductModule } from './product/product.module';
     EmailSendModule,
     MediaAvatarModule,
     TokenModule,
-    ProductModule
+    ProductModule,
+    ProductMediaModule
   ],
   controllers: [AppController],
   providers: [AppService],

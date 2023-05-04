@@ -50,6 +50,12 @@ export class ProductService {
         throw new HttpException(`daily value or value per month must be sended!`, HttpStatus.BAD_REQUEST);
       }
 
+      const regexCepTest = /^(\d{5})-?(\d{3})$/
+
+      if(regexCepTest.test(createProductDto.postalCode) === false){
+        throw new HttpException(`Postal code invalid!`, HttpStatus.BAD_REQUEST);
+      }
+
       const userExists = await this.userRepository.findOne({ where: { id: ownerUserId } })
 
       if (!userExists) {

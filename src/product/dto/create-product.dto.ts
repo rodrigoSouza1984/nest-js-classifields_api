@@ -84,9 +84,9 @@ export class CreateProductDto {
     
     @ApiProperty({
         description: 'REQUIRED  - Postal code your announcement',
-        example: 'xx-xxx-xxx'
+        example: 'xxxxx-xxx'
     })
-    postalCode?: number; 
+    postalCode?: string; 
 
     @ApiProperty({
         description: 'REQUIRED - Kind product of announcement - enum = [ farm, partyHall, house, apartment ]',

@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, Generated, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
-import { MediaAvatarEntity } from "../../media-avatar/entities/media-avatar.entity";
+import { UserMediaAvatarEntity } from "../../user-media-avatar/entities/media-avatar.entity";
 import { ProductEntity } from "src/product/entities/product.entity";
 
 export enum UserStatusEnum {
@@ -52,10 +52,10 @@ export class User {
     })
     typePermissionEnum: TypePermissionEnum;
 
-    @OneToOne(() => MediaAvatarEntity, (mediaAvatar) => mediaAvatar.user, {
+    @OneToOne(() => UserMediaAvatarEntity, (mediaAvatar) => mediaAvatar.user, {
         cascade: true,
     })
-    mediaAvatar: MediaAvatarEntity;
+    mediaAvatar: UserMediaAvatarEntity;
 
     @OneToMany(() => ProductEntity, (productEntity) => productEntity.user, {
         cascade: true,

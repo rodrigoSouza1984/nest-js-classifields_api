@@ -8,7 +8,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { PaginatedUserDto } from './dto/paginated-user.dto';
 import { User } from './entities/user.entity';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
-import { MediaAvatarService } from 'src/media-avatar/media-avatar.service';
+import { MediaAvatarService } from 'src/user-media-avatar/media-avatar.service';
 import { ApiTags, ApiQuery, ApiResponse, ApiOperation } from '@nestjs/swagger';
 
 

@@ -1,5 +1,6 @@
+import { ProductMediaEntity } from "src/product-media/entities/product-media.entity";
 import { User } from "src/user/entities/user.entity";
-import { Column, CreateDateColumn, DeleteDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 export enum TypeProductEnum {
     FARM = 'farm',
@@ -54,7 +55,7 @@ export class ProductEntity {
     number: number;   
     
     @Column({ default: 0 })
-    postalCode: number; 
+    postalCode: string; 
 
     @Column({
         type: 'enum',
@@ -67,6 +68,12 @@ export class ProductEntity {
         onDelete: 'CASCADE',
     })
     user: User;
+
+    @OneToMany(() => ProductMediaEntity, (productMedia) => productMedia.product,{
+        cascade: true,
+    })  
+    @JoinColumn()  
+    mediasProduct: ProductMediaEntity[]; 
 
     @CreateDateColumn({ type: 'timestamp' })
     createdAt: Date;

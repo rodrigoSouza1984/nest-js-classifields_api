@@ -8,7 +8,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { jwtConstants } from './constants';
 import { UserService } from 'src/user/user.service';
 import { EmailSendService } from 'src/email-send/email-send.service';
-import { MediaAvatarService } from 'src/media-avatar/media-avatar.service';
+import { MediaAvatarService } from 'src/user-media-avatar/media-avatar.service';
 import { TokenModule } from 'src/token/token.module';
 
 @Module({
