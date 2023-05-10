@@ -6,6 +6,7 @@ import { ProductEntity } from './entities/product.entity';
 import { Repository } from 'typeorm';
 import { User } from 'src/user/entities/user.entity';
 import { ProductMediaService } from 'src/product-media/product-media.service';
+import { PaginatedProductDto } from './dto/paginated-product.dto';
 
 @Injectable()
 export class ProductService {
@@ -118,6 +119,108 @@ export class ProductService {
         throw err
       }
     }
+  }  
+
+  async findAll(query: { page: number; take: number; orderBy: 'ASC' | 'DESC'; }): Promise<PaginatedProductDto> {
+    try {
+      let { page, take, orderBy } = query;
+
+      if (!page) page = 1;
+      if (!take) take = 10;
+      if (!orderBy) orderBy = 'DESC';
+
+      const [products, total] = await this.productRepository.findAndCount({
+        relations: ['mediasProduct'],
+        skip: take * (page - 1),
+        take,
+        order: { id: orderBy },
+      })
+
+      return { total, products: products };
+
+    } catch (err) {
+      if (err.driverError) {
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
+      } else {
+        throw err
+      }
+    }
+  }
+
+  async findOne(productId: number):Promise<ProductEntity> {
+    try {
+      const productExists = await this.productRepository.findOne({ where: { id: productId }, relations: ['mediasProduct'] });
+
+      if (!productExists) {
+        throw new HttpException(`User id:${productId} don't found`, HttpStatus.BAD_REQUEST);
+      }
+
+      return productExists
+
+    } catch (err) {
+      if (err.driverError) {
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
+      } else {
+        throw err
+      }
+    }
+  }  
+
+  async getAllProductsByUserId(ownerUserId: number, query: { page: number; take: number; orderBy: 'ASC' | 'DESC'; }):Promise<PaginatedProductDto> {
+    try {
+      let { page, take, orderBy } = query;
+
+      if (!page) page = 1;
+      if (!take) take = 10;
+      if (!orderBy) orderBy = 'DESC';
+
+      const userExists = await this.userRepository.findOne({ where: { id: ownerUserId }, relations: ['mediaAvatar'] });
+
+      if (!userExists) {
+        throw new HttpException(`User id:${ownerUserId} don't found`, HttpStatus.BAD_REQUEST);
+      }
+
+      const [products, total] = await this.productRepository.findAndCount({
+        where:{ownerEmailContact: userExists.email},
+        relations: ['mediasProduct'],
+        skip: take * (page - 1),
+        take,
+        order: { id: orderBy },
+      })
+
+      return { total, products: products };
+
+    } catch (err) {
+      if (err.driverError) {
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
+      } else {
+        throw err
+      }
+    }
+  }
+
+  async update(productId: number, updateProductDto: UpdateProductDto):Promise<ProductEntity> {
+    try {
+      const productExists = await this.productRepository.findOne({ where: { id: productId } });
+
+      if (!productExists) {
+        throw new HttpException(`User id:${productId} don't found`, HttpStatus.BAD_REQUEST);
+      }
+
+      await this.productRepository.save({
+        ...updateProductDto,
+        id: Number(productId),
+      }); 
+      
+      return await this.findOne(productId)
+
+    } catch (err) {
+      if (err.driverError) {
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
+      } else {
+        throw err
+      }
+    }
   }
 
   async delete(ownerUserId: number, productId: number) {
@@ -155,19 +258,5 @@ export class ProductService {
     }
   }
 
-  findAll() {
-    return `This action returns all product`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} product`;
-  }
-
-  update(id: number, updateProductDto: UpdateProductDto) {
-    return `This action updates a #${id} product`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} product`;
-  }
+  
 }

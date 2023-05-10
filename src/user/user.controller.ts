@@ -10,6 +10,7 @@ import { User } from './entities/user.entity';
 import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
 import { MediaAvatarService } from 'src/user-media-avatar/media-avatar.service';
 import { ApiTags, ApiQuery, ApiResponse, ApiOperation } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 
 @ApiTags('user')
@@ -33,18 +34,20 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Get all registered users',
     description: `Get all registered users, return user list paginated`,
     tags: ['user'],
   })
+  @ApiQuery({ name: 'query page', description: 'number page', required: false })
+  @ApiQuery({ name: 'query take', description: 'total itens returneds per page', required: false })
   @Get()
   async getAllUsers(@Query() query: { page: number; take: number; orderBy: 'ASC' | 'DESC' }): Promise<PaginatedUserDto> {    
     return await this.userService.getAllUsers(query);
   }
 
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Receive param: user id ',
     description: `Get user owner id sended param`,
@@ -53,8 +56,8 @@ export class UserController {
   @Get(':userId')
   getUserById(@Param('userId') userId: number) {
     return this.userService.getUserById(userId);
-  }    
-
+  }
+  
   @ApiOperation({
     summary: 'Receive param: user name ',
     description: `Receive in the param the userName realize the get by userName, if exists already user with this user name he return 3 options name, if don't exists userName return userName sended`,
@@ -65,7 +68,7 @@ export class UserController {
     return this.userService.createUserNameUnique(userName);
   } 
 
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Get('getByFilter/:userId')
   @ApiOperation({
     summary: 'Receive param : user id, query param : email or userName => url/user/userId?email=a@email.com',
@@ -79,7 +82,7 @@ export class UserController {
     return await this.userService.getByFilter(userId,query)
   }
 
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'update by param : user id',
     description: `Update user data, that can to be modifications`,
@@ -90,7 +93,7 @@ export class UserController {
     return this.userService.updateUser(userId, updateUserDto);
   }
 
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'remove user by param : user id',
     description: `remove user data`,
