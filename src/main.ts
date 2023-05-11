@@ -6,7 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule); 
   
   const config = new DocumentBuilder()
-    .setTitle('Documentation made with Swagger - Classifields API')
+    .setTitle('Documentation - Classifields API')
     .setDescription(
       'Backend of aplication about sales anuncies',
     )

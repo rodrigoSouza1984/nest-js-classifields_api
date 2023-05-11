@@ -41,7 +41,7 @@ export class UserController {
     tags: ['user'],
   })
   @ApiQuery({ name: 'query page', description: 'number page', required: false })
-  @ApiQuery({ name: 'query take', description: 'total itens returneds per page', required: false })
+  @ApiQuery({ name: 'query take', description: 'total items returned per page', required: false })
   @Get()
   async getAllUsers(@Query() query: { page: number; take: number; orderBy: 'ASC' | 'DESC' }): Promise<PaginatedUserDto> {    
     return await this.userService.getAllUsers(query);
@@ -68,8 +68,7 @@ export class UserController {
     return this.userService.createUserNameUnique(userName);
   } 
 
-  @UseGuards(JwtAuthGuard)
-  @Get('getByFilter/:userId')
+  @UseGuards(JwtAuthGuard)  
   @ApiOperation({
     summary: 'Receive param : user id, query param : email or userName => url/user/userId?email=a@email.com',
     description: `Get user owner email or userName by filter query`,
@@ -78,6 +77,7 @@ export class UserController {
   @ApiQuery({ name: 'query userName', description: 'Filter products by name', required: false })
   @ApiQuery({ name: 'query email', description: 'Filter products by email', required: false })
   @ApiResponse({ status: 200, description: 'Return user by filter sended' })
+  @Get('getByFilter/:userId')
   async getByFilter(@Param('userId') userId: number,@Query() query): Promise<User> {
     return await this.userService.getByFilter(userId,query)
   }
@@ -114,8 +114,7 @@ export class UserController {
   async login(@Request() req) {    
     return this.authService.login(req.user);
   }
-
-  @Post('forgetedOrUpdatePassword')
+  
   @ApiOperation({
     summary: 'update, and too when user forget password',
     description: `send params by body, if send password he will do update password, 
@@ -123,6 +122,7 @@ export class UserController {
     subscribled in user account, 3 time tryed send code he return the code for show user of appropriate modo `,
     tags: ['user'],
   })
+  @Post('forgetedOrUpdatePassword')
   forgetedOrUpdatePassword(@Body() data:UpdateUserPasswordDto) {    
     return this.userService.forgetedOrUpdatePassword(data);
   } 

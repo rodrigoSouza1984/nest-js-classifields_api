@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateProductMediaDto } from './dto/create-product-media.dto';
+import { CreateProductMediaDto } from './dto/create-media-product.dto';
 import { UpdateProductMediaDto } from './dto/update-product-media.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductEntity } from 'src/product/entities/product.entity';
@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { ProductMediaEntity } from './entities/product-media.entity';
 import index from '../common/firebase';
 import { User } from 'src/user/entities/user.entity';
+import { PaginatedProductMediaDto } from './dto/paginate-product-media.dto';
 
 @Injectable()
 export class ProductMediaService {
@@ -93,8 +94,52 @@ export class ProductMediaService {
         return err
       }
     }
+  }   
+
+  async getAllMediasProducts(query: { page: number; take: number; orderBy: 'ASC' | 'DESC'; }): Promise<PaginatedProductMediaDto> {
+    try {
+      let { page, take, orderBy } = query;
+
+      if (!page) page = 1;
+      if (!take) take = 10;
+      if (!orderBy) orderBy = 'DESC';
+
+      const [mediasProducts, total] = await this.productMediaRepository.findAndCount({        
+        skip: take * (page - 1),
+        take,
+        order: { id: orderBy },
+      })
+
+      return { total, mediasProducts: mediasProducts };
+
+    } catch (err) {
+      if (err.driverError) {
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
+      } else {
+        throw err
+      }
+    }
   }
 
+  async getOneByMediaId(mediaId: number):Promise<ProductMediaEntity> {
+    try {
+      const mediaExists = await this.productMediaRepository.findOne({ where: { id: mediaId } });
+
+      if (!mediaExists) {
+        throw new HttpException(`Media id:${mediaId} don't found`, HttpStatus.BAD_REQUEST);
+      }
+
+      return mediaExists
+
+    } catch (err) {
+      if (err.driverError) {
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
+      } else {
+        throw err
+      }
+    }
+  }
+  
   async deleteMediasProduct(userId: number, productId: number, mediasId: number[]) {
     try {
 
@@ -134,21 +179,6 @@ export class ProductMediaService {
         return err
       }
     }
-  }
-
-  findAll() {
-    return `This action returns all productMedia`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} productMedia`;
-  }
-
-  update(id: number, updateProductMediaDto: UpdateProductMediaDto) {
-    return `This action updates a #${id} productMedia`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} productMedia`;
-  }
+  } 
+  
 }

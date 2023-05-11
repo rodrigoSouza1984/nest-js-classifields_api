@@ -29,7 +29,7 @@ export class MediaAvatarService {
 
       if (mediaExists) {
         throw new HttpException(`Media with this name, already there are only file with unique name name: ${data.name}`, HttpStatus.BAD_REQUEST);
-      }
+      }      
 
       const sizeFile = (str) => {//function for calculation size of string, 100megabyte = 104857600 Bytes        
         let size = Buffer.from(str).length;

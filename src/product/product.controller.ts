@@ -31,7 +31,7 @@ export class ProductController {
     tags: ['product'],
   })
   @ApiQuery({ name: 'query page', description: 'number page', required: false })
-  @ApiQuery({ name: 'query take', description: 'total itens returneds per page', required: false })
+  @ApiQuery({ name: 'query take', description: 'total items returned per page', required: false })
   @Get()
   findAll(@Query() query: { page: number; take: number; orderBy: 'ASC' | 'DESC' }): Promise<PaginatedProductDto> {
     return this.productService.findAll(query);
