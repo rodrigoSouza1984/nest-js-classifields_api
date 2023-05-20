@@ -361,7 +361,7 @@ export class UserService {
 
   //FOR USE IN LOGIN AUTHSERVICE
   async findOne(email: string): Promise<User | undefined> {
-    return this.userRepository.findOne({ where: { email: email } });
+    return this.userRepository.findOne({ where: { email: email }, relations: ['mediaAvatar'] });
   }
 
 }

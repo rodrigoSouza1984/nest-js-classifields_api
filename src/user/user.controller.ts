@@ -102,18 +102,7 @@ export class UserController {
   @Delete(':userId')
   remove(@Param('userId') userId: number) {
     return this.userService.removeUser(userId);
-  }
-
-  @UseGuards(AuthGuard('local'))
-  @ApiOperation({
-    summary: 'realize sign in user by body params',
-    description: `user send email and password, in the body params`,
-    tags: ['user'],
-  })
-  @Post('login')
-  async login(@Request() req) {    
-    return this.authService.login(req.user);
-  }
+  }  
   
   @ApiOperation({
     summary: 'update, and too when user forget password',
@@ -126,5 +115,26 @@ export class UserController {
   forgetedOrUpdatePassword(@Body() data:UpdateUserPasswordDto) {    
     return this.userService.forgetedOrUpdatePassword(data);
   } 
+
+  @UseGuards(AuthGuard('local'))
+  @ApiOperation({
+    summary: 'realize sign in user by body params',
+    description: `user send email and password, in the body params`,
+    tags: ['user'],
+  })
+  @Post('login')
+  async login(@Request() req) {        
+    return this.authService.login(req.user);
+  }
+
+  @UseGuards(JwtAuthGuard)
+  @ApiOperation({    
+    description: `Method only to see token valid yet`,
+    tags: ['user'],
+  })
+  @Get('/token/validateToken')
+  validateToken() {      
+    return true
+  }
 
 }
