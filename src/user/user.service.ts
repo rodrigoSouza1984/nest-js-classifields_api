@@ -62,7 +62,7 @@ export class UserService {
       const userCreated = await this.userRepository.save(user)
 
       if (userCreated && createUserDto.mediaAvatar) {
-
+        
         await this.mediaAvatarService.create(userCreated.id, createUserDto.mediaAvatar)
 
         return await this.userRepository.findOne({ where: { id: userCreated.id }, relations: ['mediaAvatar'] })
@@ -77,9 +77,13 @@ export class UserService {
 
     } catch (err) {
       if (err.driverError) {
-        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
       } else {
-        throw err
+        if (err.response.status > 500) {
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+        } else {
+          throw err
+        }
       }
     }
   }

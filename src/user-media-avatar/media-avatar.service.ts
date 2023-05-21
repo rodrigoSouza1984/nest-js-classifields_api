@@ -29,7 +29,7 @@ export class MediaAvatarService {
 
       if (mediaExists) {
         throw new HttpException(`Media with this name, already there are only file with unique name name: ${data.name}`, HttpStatus.BAD_REQUEST);
-      }      
+      } 
 
       const sizeFile = (str) => {//function for calculation size of string, 100megabyte = 104857600 Bytes        
         let size = Buffer.from(str).length;
@@ -46,7 +46,7 @@ export class MediaAvatarService {
       const filePath = `classifields/users/${userId}/avatar/${data.name}`
 
       const url = await index.uploadBase64MediaToFirebaseStorage(data.base64, data.mimeType, filePath)
-
+      
       if (!url) {
         throw new HttpException(`Avatar don't created there are some wrong in the bucket no returned url`, HttpStatus.BAD_REQUEST);
       } else {
@@ -57,7 +57,7 @@ export class MediaAvatarService {
         media.url = url.toString()
         media.user = userExists
 
-        await this.userMediaAvatarRepository.save(media)
+        const mediaSave = await this.userMediaAvatarRepository.save(media)        
 
         return await this.userRepository.findOne({ where: { id: userId }, relations: ['mediaAvatar'] })
       }
