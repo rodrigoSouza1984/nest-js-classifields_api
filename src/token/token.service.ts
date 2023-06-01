@@ -12,35 +12,48 @@ import { AuthService } from 'src/auth/auth.service';
 export class TokenService {
 
   constructor(
-    @InjectRepository(TokenEntity) private tokenRepository: Repository<TokenEntity>,  
-    private userService: UserService, 
-    @Inject (forwardRef(()=>AuthService))   
-    private authService: AuthService 
+    @InjectRepository(TokenEntity) private tokenRepository: Repository<TokenEntity>,
+    private userService: UserService,
+    @Inject(forwardRef(() => AuthService))
+    private authService: AuthService
   ) { }
 
   async create(createTokenDto: CreateTokenDto) {
-    const tokenExists = await this.tokenRepository.findOne({where: {email: createTokenDto.email}})
+    const tokenExists = await this.tokenRepository.findOne({ where: { email: createTokenDto.email } })
 
-    if(tokenExists){
+    if (tokenExists) {
       await this.tokenRepository.save({
         ...createTokenDto,
         id: Number(tokenExists.id),
       })
-    }else{
+    } else {
       await this.tokenRepository.save(createTokenDto)
-    }    
+    }
   }
 
-  async refreshToken(refreshTokenDto:RefreshTokenDto){
-    const tokenExists = await this.tokenRepository.findOne({where: {hash: refreshTokenDto.oldToken}})
-    
-    if(tokenExists){
-      let user = await this.userService.findOne(tokenExists.email)
+  async refreshToken(refreshTokenDto: RefreshTokenDto) {
+    try {
+      const tokenExists = await this.tokenRepository.findOne({ where: { hash: refreshTokenDto.oldToken } })
 
-      return this.authService.login(user)
-    }else{
-      return new HttpException({errorMessage: 'Token inválido'}, HttpStatus.UNAUTHORIZED)
+      if (tokenExists) {
+        let user = await this.userService.findOne(tokenExists.email)
+
+        return this.authService.login(user)
+      } else {
+        throw new HttpException({ errorMessage: 'Token inválido' }, HttpStatus.UNAUTHORIZED)
+      }
+    } catch (err) {
+      if (err.driverError) {
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
+      } else {
+        if (err.status >= 300 && err.status < 500) {
+          throw err
+        } else {
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+      }
     }
+
   }
 
   findAll() {

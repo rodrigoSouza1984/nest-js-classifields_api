@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Request , Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Request, Query, HttpException, HttpStatus } from '@nestjs/common';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -17,11 +17,11 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 @Controller('user')
 export class UserController {
   constructor(
-    private readonly userService: UserService, 
-    private authService: AuthService, 
-    private mediaAvatarService : MediaAvatarService
-  ) {}
-  
+    private readonly userService: UserService,
+    private authService: AuthService,
+    private mediaAvatarService: MediaAvatarService
+  ) { }
+
   @ApiOperation({
     summary: 'Create a user account',
     description: `create a user account , 
@@ -30,7 +30,7 @@ export class UserController {
     tags: ['user'],
   })
   @Post()
-  create(@Body() createUserDto: CreateUserDto) {  
+  create(@Body() createUserDto: CreateUserDto) {
     return this.userService.create(createUserDto);
   }
 
@@ -43,7 +43,7 @@ export class UserController {
   @ApiQuery({ name: 'query page', description: 'number page', required: false })
   @ApiQuery({ name: 'query take', description: 'total items returned per page', required: false })
   @Get()
-  async getAllUsers(@Query() query: { page: number; take: number; orderBy: 'ASC' | 'DESC' }): Promise<PaginatedUserDto> {    
+  async getAllUsers(@Query() query: { page: number; take: number; orderBy: 'ASC' | 'DESC' }): Promise<PaginatedUserDto> {
     return await this.userService.getAllUsers(query);
   }
 
@@ -57,7 +57,7 @@ export class UserController {
   getUserById(@Param('userId') userId: number) {
     return this.userService.getUserById(userId);
   }
-  
+
   @ApiOperation({
     summary: 'Receive param: user name ',
     description: `Receive in the param the userName realize the get by userName, if exists already user with this user name he return 3 options name, if don't exists userName return userName sended`,
@@ -66,9 +66,9 @@ export class UserController {
   @Get('createUserNameUnique/:userName')
   createUserNameUnique(@Param('userName') userName: string) {
     return this.userService.createUserNameUnique(userName);
-  } 
+  }
 
-  @UseGuards(JwtAuthGuard)  
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Receive param : user id, query param : email or userName => url/user/userId?email=a@email.com',
     description: `Get user owner email or userName by filter query`,
@@ -78,8 +78,8 @@ export class UserController {
   @ApiQuery({ name: 'query email', description: 'Filter products by email', required: false })
   @ApiResponse({ status: 200, description: 'Return user by filter sended' })
   @Get('getByFilter/:userId')
-  async getByFilter(@Param('userId') userId: number,@Query() query): Promise<User> {
-    return await this.userService.getByFilter(userId,query)
+  async getByFilter(@Param('userId') userId: number, @Query() query): Promise<User> {
+    return await this.userService.getByFilter(userId, query)
   }
 
   @UseGuards(JwtAuthGuard)
@@ -102,8 +102,8 @@ export class UserController {
   @Delete(':userId')
   remove(@Param('userId') userId: number) {
     return this.userService.removeUser(userId);
-  }  
-  
+  }
+
   @ApiOperation({
     summary: 'update, and too when user forget password',
     description: `send params by body, if send password he will do update password, 
@@ -112,9 +112,9 @@ export class UserController {
     tags: ['user'],
   })
   @Post('forgetedOrUpdatePassword')
-  forgetedOrUpdatePassword(@Body() data:UpdateUserPasswordDto) {    
+  forgetedOrUpdatePassword(@Body() data: UpdateUserPasswordDto) {
     return this.userService.forgetedOrUpdatePassword(data);
-  } 
+  }
 
   @UseGuards(AuthGuard('local'))
   @ApiOperation({
@@ -123,18 +123,31 @@ export class UserController {
     tags: ['user'],
   })
   @Post('login')
-  async login(@Request() req) {        
+  async login(@Request() req) {
     return this.authService.login(req.user);
   }
 
   @UseGuards(JwtAuthGuard)
-  @ApiOperation({    
+  @ApiOperation({
     description: `Method only to see token valid yet`,
     tags: ['user'],
   })
   @Get('/token/validateToken')
-  validateToken() {      
-    return true
+  validateToken() {
+    try {
+      return true
+    } catch (err) {
+      if (err.driverError) {
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
+      } else {
+        if (err.status >= 300 && err.status < 500) {
+          throw err
+        } else {
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+      }
+    }
+
   }
 
 }

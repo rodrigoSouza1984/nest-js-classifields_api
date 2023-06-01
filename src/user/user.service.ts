@@ -119,13 +119,15 @@ export class UserService {
             if (!userExistsToo) {
               namesOptions.push(name)
             }
-
+            console.log(namesOptions)
             return namesOptions
           }
         }
       } else {
 
-        return userName
+        let result = []
+
+        return result = [userName]
 
       }
 
