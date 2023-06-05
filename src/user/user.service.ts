@@ -90,6 +90,11 @@ export class UserService {
 
   async createUserNameUnique(userName: string) {//make some options to user can use how your username 
     try {
+
+      if(userName === '' || userName === undefined){
+        throw new HttpException(`Field userName is empty`, HttpStatus.BAD_REQUEST);
+      }
+
       const userExists = await this.userRepository.findOne({ where: { userName: userName } });
 
       if (userExists) {
