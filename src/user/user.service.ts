@@ -82,6 +82,7 @@ export class UserService {
         if (err.response.status > 500) {
           throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
         } else {
+          console.log(err)
           throw err
         }
       }
