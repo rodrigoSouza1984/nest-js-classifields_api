@@ -28,7 +28,7 @@ export class AuthService {
         await this.tokenService.create({email: user.email, hash: token})
         
         return {
-          user: user,
+          user,
           access_token: token,//
         };
     }

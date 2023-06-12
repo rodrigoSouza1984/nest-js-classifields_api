@@ -28,7 +28,7 @@ export class UserService {
   ) { }
 
   async create(createUserDto: CreateUserDto) {
-    try {
+    try {      
 
       if (createUserDto.realName === '' || createUserDto.realName === undefined) {
         throw new HttpException(`Input Field 'realName' have be send, it's a field needed!`, HttpStatus.BAD_REQUEST);
@@ -62,7 +62,7 @@ export class UserService {
       const userCreated = await this.userRepository.save(user)
 
       if (userCreated && createUserDto.mediaAvatar) {
-        
+
         await this.mediaAvatarService.create(userCreated.id, createUserDto.mediaAvatar)
 
         return await this.userRepository.findOne({ where: { id: userCreated.id }, relations: ['mediaAvatar'] })
@@ -92,7 +92,7 @@ export class UserService {
   async createUserNameUnique(userName: string) {//make some options to user can use how your username 
     try {
 
-      if(userName === '' || userName === undefined){
+      if (userName === '' || userName === undefined) {
         throw new HttpException(`Field userName is empty`, HttpStatus.BAD_REQUEST);
       }
 
@@ -334,8 +334,10 @@ export class UserService {
           id: Number(userExists.id),
         });
 
+        let emailSended: boolean = false
+
         if (updatePassword) {
-          await this.emailSendService.sendEmail(
+          const a = await this.emailSendService.sendEmail(
             data.email, {
             newPassword: newPassword,
             subject: 'Nova Senha Classifields',
@@ -343,9 +345,14 @@ export class UserService {
             Use sua nova senha, após uso se desejar troque para uma de sua escolha,\n 
             realizando uma atualização de cadastro`
           }
-          )
+          ).then((r) => {
+            emailSended = true
+          }).catch(err => {
+            console.log(err)
+            emailSended = false
+          })
         }
-
+        
         if (userUpdate.qtdTryingSendEmail === 3) {// in 3 time try send email its return new password if front must return a push local or push firebase
 
           let userUpdate = {
@@ -358,15 +365,27 @@ export class UserService {
             id: Number(userExists.id),
           });
 
-          return { passord: newPassword }
+          //return { passord: newPassword }
+        }
+
+        if (emailSended) {
+          return { message: 'Email enviado com sua nova senha temporária, verifique sua caixa de span ou lixo! Caso não encontre tente novamente ou entre em contato com o suporte.' }
+        } else {
+          return {message: 'Humm...Aconteceu algum problema tente mais tarde ou entre em contato com o suporte,'}       
         }
       }
 
     } catch (err) {
       if (err.driverError) {
-        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
       } else {
-        throw err
+        if (err.status >= 300 && err.status < 500) {
+          throw err
+        } else if (err.message) {
+          throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        } else {
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
       }
     }
   }
