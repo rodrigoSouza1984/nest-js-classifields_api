@@ -28,7 +28,7 @@ export class UserService {
   ) { }
 
   async create(createUserDto: CreateUserDto) {
-    try {      
+    try {
 
       if (createUserDto.realName === '' || createUserDto.realName === undefined) {
         throw new HttpException(`Input Field 'realName' have be send, it's a field needed!`, HttpStatus.BAD_REQUEST);
@@ -50,6 +50,14 @@ export class UserService {
         throw new HttpException(`Password and confirmPassword must to be equals!`, HttpStatus.BAD_REQUEST);
       }
 
+      if(createUserDto.email){
+        const emailExist = await this.verifyEmailExists(createUserDto.email)
+
+        if(emailExist === true){
+          throw new HttpException(`Email already exist, please use other in the your register`, HttpStatus.BAD_REQUEST);
+        }
+      }
+
       const user = new User()
 
       user.userName = createUserDto.userName
@@ -68,6 +76,7 @@ export class UserService {
         return await this.userRepository.findOne({ where: { id: userCreated.id }, relations: ['mediaAvatar'] })
 
       } else {
+        console.log(userCreated)
         return userCreated
       }
 
@@ -84,6 +93,31 @@ export class UserService {
         } else {
           console.log(err)
           throw err
+        }
+      }
+    }
+  }
+
+  async verifyEmailExists(email: string):Promise<Boolean> {
+    try {
+
+      const emailExists = await this.userRepository.findOne({ where: { email: email } })
+
+      if (emailExists) {
+        return true
+      } else {
+        return false
+      }
+    } catch (err) {
+      if (err.driverError) {
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
+      } else {
+        if (err.status >= 300 && err.status < 500) {
+          throw err
+        } else if (err.message) {
+          throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        } else {
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
         }
       }
     }
@@ -352,7 +386,7 @@ export class UserService {
             emailSended = false
           })
         }
-        
+
         if (userUpdate.qtdTryingSendEmail === 3) {// in 3 time try send email its return new password if front must return a push local or push firebase
 
           let userUpdate = {
@@ -371,7 +405,7 @@ export class UserService {
         if (emailSended) {
           return { message: 'Email enviado com sua nova senha temporária, verifique sua caixa de span ou lixo! Caso não encontre tente novamente ou entre em contato com o suporte.' }
         } else {
-          return {message: 'Humm...Aconteceu algum problema tente mais tarde ou entre em contato com o suporte,'}       
+          return { message: 'Humm...Aconteceu algum problema tente mais tarde ou entre em contato com o suporte,' }
         }
       }
 

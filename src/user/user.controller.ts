@@ -68,6 +68,16 @@ export class UserController {
     return this.userService.createUserNameUnique(userName);
   }
 
+  @ApiOperation({
+    summary: 'Receive param: email',
+    description: `Receive in the param the email realize the get by email, if exists already user with this email return true, if don't exists return false`,
+    tags: ['user'],
+  })
+  @Get('verifyEmailExists/:email')
+  async verifyEmailExists(@Param('email') email: string):Promise<Boolean> {
+    return await this.userService.verifyEmailExists(email);
+  }
+
   @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Receive param : user id, query param : email or userName => url/user/userId?email=a@email.com',
