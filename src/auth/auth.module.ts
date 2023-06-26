@@ -15,7 +15,7 @@ import { TokenModule } from 'src/token/token.module';
   imports: [forwardRef(()=>UserModule),PassportModule, TokenModule,
     JwtModule.register({
       secret: jwtConstants.secret,
-      signOptions: { expiresIn: '60s' },
+      signOptions: { expiresIn: '3600s' },
     }),
   ],
   providers: [AuthService, LocalStrategy, JwtStrategy, UserService, EmailSendService, MediaAvatarService],

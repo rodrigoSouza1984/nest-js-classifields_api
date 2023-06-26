@@ -34,7 +34,7 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Get all registered users',
     description: `Get all registered users, return user list paginated`,

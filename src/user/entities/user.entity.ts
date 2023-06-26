@@ -38,6 +38,9 @@ export class User {
     @Column({ default: 0 })
     qtdTryingSendEmail: number;
 
+    @Column({ nullable: true })
+    token: string
+
     @Column({
         type: 'enum',
         enum: UserStatusEnum,

@@ -58,6 +58,7 @@ export class UserService {
         }
       }
 
+      console.log(createUserDto)
       const user = new User()
 
       user.userName = createUserDto.userName
