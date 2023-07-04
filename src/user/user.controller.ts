@@ -7,10 +7,11 @@ import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from 'src/auth/auth.service';
 import { PaginatedUserDto } from './dto/paginated-user.dto';
 import { User } from './entities/user.entity';
-import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
+import { UpdateUserForgetPasswordDto } from './dto/update-user-forget-password.dto';
 import { MediaAvatarService } from 'src/user-media-avatar/media-avatar.service';
 import { ApiTags, ApiQuery, ApiResponse, ApiOperation } from '@nestjs/swagger';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 
 @ApiTags('user')
@@ -74,7 +75,7 @@ export class UserController {
     tags: ['user'],
   })
   @Get('verifyEmailExists/:email')
-  async verifyEmailExists(@Param('email') email: string):Promise<Boolean> {
+  async verifyEmailExists(@Param('email') email: string) {
     return await this.userService.verifyEmailExists(email);
   }
 
@@ -122,8 +123,33 @@ export class UserController {
     tags: ['user'],
   })
   @Post('forgetedOrUpdatePassword')
-  forgetedOrUpdatePassword(@Body() data: UpdateUserPasswordDto) {
+  forgetedOrUpdatePassword(@Body() data: UpdateUserForgetPasswordDto) {
     return this.userService.forgetedOrUpdatePassword(data);
+  }
+
+  @UseGuards(AuthGuard('local'))
+  @ApiOperation({
+    summary: 'Compare password came by body with password registered by userId sended by param',
+    description: `Method created for compare password came by body with password registered by userId sended by param, return function 
+    {      
+      "passwordSendedIsEqualRegistered": true
+    }`,
+    tags: ['user'],
+  })
+  @Post('comparePasswordUser/:userId')
+  comparePasswordUser(@Param('userId') userId: number, @Body() data: UpdatePasswordDto) {
+    return this.userService.comparePasswordUser(userId, data);
+  }
+
+  @UseGuards(AuthGuard('local'))
+  @ApiOperation({
+    summary: 'Compare password came by body with password registered by userId sended by param',
+    description: `Method created for compare password came by body with password registered by userId sended by param, return function boolean`,
+    tags: ['user'],
+  })
+  @Post('updatePassword/:userId')
+  updatePassword(@Param('userId') userId: number, @Body() data: UpdatePasswordDto) {
+    return this.userService.updatePassword(userId, data);
   }
 
   @UseGuards(AuthGuard('local'))

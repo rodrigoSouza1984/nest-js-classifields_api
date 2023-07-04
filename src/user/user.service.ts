@@ -11,9 +11,10 @@ import * as bcrypt from 'bcrypt';
 import { PaginatedUserDto } from './dto/paginated-user.dto';
 import { EmailSendService } from 'src/email-send/email-send.service';
 
-import { UpdateUserPasswordDto } from './dto/update-user-password.dto';
+import { UpdateUserForgetPasswordDto } from './dto/update-user-forget-password.dto';
 import { MediaAvatarService } from 'src/user-media-avatar/media-avatar.service';
 import * as crypto from 'crypto';
+import { UpdatePasswordDto } from './dto/update-password.dto';
 
 //import { MediaAvatarService } from './media-avatar.service';
 
@@ -50,10 +51,10 @@ export class UserService {
         throw new HttpException(`Password and confirmPassword must to be equals!`, HttpStatus.BAD_REQUEST);
       }
 
-      if(createUserDto.email){
+      if (createUserDto.email) {
         const emailExist = await this.verifyEmailExists(createUserDto.email)
 
-        if(emailExist === true){
+        if (emailExist === true) {
           throw new HttpException(`Email already exist, please use other in the your register`, HttpStatus.BAD_REQUEST);
         }
       }
@@ -99,15 +100,19 @@ export class UserService {
     }
   }
 
-  async verifyEmailExists(email: string):Promise<Boolean> {
+  async verifyEmailExists(email: string) {
     try {
 
       const emailExists = await this.userRepository.findOne({ where: { email: email } })
 
       if (emailExists) {
+
         return true
+
       } else {
+
         return false
+
       }
     } catch (err) {
       if (err.driverError) {
@@ -234,6 +239,7 @@ export class UserService {
 
   async getUserById(userId: number) {
     try {
+      console.log(userId, 77777)
       const userExists = await this.userRepository.findOne({ where: { id: userId }, relations: ['mediaAvatar'] });
 
       if (!userExists) {
@@ -329,7 +335,7 @@ export class UserService {
     }
   }
 
-  async forgetedOrUpdatePassword(data: UpdateUserPasswordDto) {//when to try 3 time send email, on 3 time return the code generate for send other form because email this bug
+  async forgetedOrUpdatePassword(data: UpdateUserForgetPasswordDto) {//when to try 3 time send email, on 3 time return the code generate for send other form because email this bug
     try {
 
       if (!data.email) {
@@ -342,26 +348,44 @@ export class UserService {
         throw new HttpException(`User email:${data.email} don't found`, HttpStatus.BAD_REQUEST);
       }
 
-      if (data.password) {
+      const newPassword = `ab@${Math.floor(Math.random() * 9000) + 1000}`
 
-        if (data.password !== data.confirmPassword) {
-          throw new HttpException(`Password and confirmPassword must to be equals!`, HttpStatus.BAD_REQUEST);
+      data.password = bcrypt.hashSync(newPassword, 8)
+
+      let userUpdate = {
+        password: data.password,
+        qtdTryingSendEmail: userExists.qtdTryingSendEmail + 1
+      }
+
+      const updatePassword = await this.userRepository.save({
+        ...userUpdate,
+        id: Number(userExists.id),
+      });
+
+      let emailSended: boolean = false
+
+      if (updatePassword) {
+        const a = await this.emailSendService.sendEmail(
+          data.email, {
+          newPassword: newPassword,
+          subject: 'Nova Senha Classifields',
+          text: `NOVA SENHA : ${newPassword}.\n 
+            Use sua nova senha, após uso se desejar troque para uma de sua escolha,\n 
+            realizando uma atualização de cadastro`
         }
+        ).then((r) => {
+          emailSended = true
+        }).catch(err => {
+          console.log(err)
+          emailSended = false
+        })
+      }
 
-        data.password = bcrypt.hashSync(data.password, 8)
-
-        return await this.userRepository.save({
-          ...data,
-          id: Number(userExists.id),
-        });
-      } else {
-        const newPassword = `ab@${Math.floor(Math.random() * 9000) + 1000}`
-
-        data.password = bcrypt.hashSync(newPassword, 8)
+      if (userUpdate.qtdTryingSendEmail === 3) {// in 3 time try send email its return new password if front must return a push local or push firebase
 
         let userUpdate = {
           password: data.password,
-          qtdTryingSendEmail: userExists.qtdTryingSendEmail + 1
+          qtdTryingSendEmail: 0
         }
 
         const updatePassword = await this.userRepository.save({
@@ -369,45 +393,119 @@ export class UserService {
           id: Number(userExists.id),
         });
 
-        let emailSended: boolean = false
+        //return { passord: newPassword }
+      }
+
+      if (emailSended) {
+        return { message: 'Email enviado com sua nova senha temporária, verifique sua caixa de span ou lixo! Caso não encontre tente novamente ou entre em contato com o suporte.' }
+      } else {
+        return { message: 'Humm...Aconteceu algum problema tente mais tarde ou entre em contato com o suporte,' }
+      }
+
+
+    } catch (err) {
+      if (err.driverError) {
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
+      } else {
+        if (err.status >= 300 && err.status < 500) {
+          throw err
+        } else if (err.message) {
+          throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        } else {
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+      }
+    }
+  }
+
+  async comparePasswordUser(userId: number, data: UpdatePasswordDto) {
+    try {
+
+      if (data.password === '' || data.password === undefined) {
+        throw new HttpException(`Input Field 'password' have be send, it's a field needed!`, HttpStatus.BAD_REQUEST);
+      }
+
+      if (data.confirmPassword === '' || data.confirmPassword === undefined) {
+        throw new HttpException(`Input Field 'confirmPassword' have be send, it's a field needed!`, HttpStatus.BAD_REQUEST);
+      }
+
+      const userExists = await this.userRepository.findOne({ where: { id: userId } })
+
+      if (!userExists) {
+        throw new HttpException(`User id:${userId} don't found, method: comparePasswordUser`, HttpStatus.BAD_REQUEST);
+      }
+
+      if (data.password !== data.confirmPassword) {
+        throw new HttpException(`Password and confirmPassword must to be equals!, method: comparePasswordUser`, HttpStatus.BAD_REQUEST);
+      }
+
+      const passwordSendedIsEqual = await bcrypt.compare(data.password, userExists.password);
+
+      return { passwordSendedIsEqualRegistered: passwordSendedIsEqual }
+
+    } catch (err) {
+      if (err.driverError) {
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
+      } else {
+        if (err.status >= 300 && err.status < 500) {
+          throw err
+        } else if (err.message) {
+          throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        } else {
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+      }
+    }
+  }
+
+  async updatePassword(userId: number, data: UpdatePasswordDto) {
+    try {
+
+      if (data.password === '' || data.password === undefined) {
+        throw new HttpException(`Input Field 'password' have be send, it's a field needed!`, HttpStatus.BAD_REQUEST);
+      }
+
+      if (data.confirmPassword === '' || data.confirmPassword === undefined) {
+        throw new HttpException(`Input Field 'confirmPassword' have be send, it's a field needed!`, HttpStatus.BAD_REQUEST);
+      }
+
+      if (data.newPassword === '' || data.newPassword === undefined) {
+        throw new HttpException(`Input Field 'newPassword' have be send, it's a field needed!`, HttpStatus.BAD_REQUEST);
+      }
+
+      if (data.confirmNewPassword === '' || data.confirmNewPassword === undefined) {
+        throw new HttpException(`Input Field 'confirmNewPassword' have be send, it's a field needed!`, HttpStatus.BAD_REQUEST);
+      }
+
+      const userExists = await this.userRepository.findOne({ where: { id: userId } })
+
+      if (!userExists) {
+        throw new HttpException(`User id:${userId} don't found, method: updatePassword`, HttpStatus.BAD_REQUEST);
+      }
+
+      if (data.password !== data.confirmPassword) {
+        throw new HttpException(`Password and confirmPassword must to be equals!, method: updatePassword`, HttpStatus.BAD_REQUEST);
+      }
+
+      const comeparePasswordOld = await this.comparePasswordUser(userId, data)
+
+      if (comeparePasswordOld.passwordSendedIsEqualRegistered === true) {
+
+        if (data.newPassword !== data.confirmNewPassword) {
+          throw new HttpException(`newPassword and confirmNewPassword must to be equals!, method: updatePassword`, HttpStatus.BAD_REQUEST);
+        }
+
+        let passwordUpdate = { password: bcrypt.hashSync(data.newPassword, 8) }
+
+        const updatePassword = await this.userRepository.save({ ...passwordUpdate, id: Number(userExists.id), })
 
         if (updatePassword) {
-          const a = await this.emailSendService.sendEmail(
-            data.email, {
-            newPassword: newPassword,
-            subject: 'Nova Senha Classifields',
-            text: `NOVA SENHA : ${newPassword}.\n 
-            Use sua nova senha, após uso se desejar troque para uma de sua escolha,\n 
-            realizando uma atualização de cadastro`
-          }
-          ).then((r) => {
-            emailSended = true
-          }).catch(err => {
-            console.log(err)
-            emailSended = false
-          })
-        }
-
-        if (userUpdate.qtdTryingSendEmail === 3) {// in 3 time try send email its return new password if front must return a push local or push firebase
-
-          let userUpdate = {
-            password: data.password,
-            qtdTryingSendEmail: 0
-          }
-
-          const updatePassword = await this.userRepository.save({
-            ...userUpdate,
-            id: Number(userExists.id),
-          });
-
-          //return { passord: newPassword }
-        }
-
-        if (emailSended) {
-          return { message: 'Email enviado com sua nova senha temporária, verifique sua caixa de span ou lixo! Caso não encontre tente novamente ou entre em contato com o suporte.' }
+          return true
         } else {
-          return { message: 'Humm...Aconteceu algum problema tente mais tarde ou entre em contato com o suporte,' }
+          return false
         }
+      } else {
+        throw new HttpException(`Password don't equal password registerede by this user userId: ${userId}, method: updatePassword`, HttpStatus.BAD_REQUEST);
       }
 
     } catch (err) {
