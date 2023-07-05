@@ -335,7 +335,7 @@ export class UserService {
     }
   }
 
-  async forgetedOrUpdatePassword(data: UpdateUserForgetPasswordDto) {//when to try 3 time send email, on 3 time return the code generate for send other form because email this bug
+  async forgetedPassword(data: UpdateUserForgetPasswordDto) {//when to try 3 time send email, on 3 time return the code generate for send other form because email this bug
     try {
 
       if (!data.email) {

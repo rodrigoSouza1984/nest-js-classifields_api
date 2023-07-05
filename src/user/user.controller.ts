@@ -122,9 +122,9 @@ export class UserController {
     subscribled in user account, 3 time tryed send code he return the code for show user of appropriate modo `,
     tags: ['user'],
   })
-  @Post('forgetedOrUpdatePassword')
-  forgetedOrUpdatePassword(@Body() data: UpdateUserForgetPasswordDto) {
-    return this.userService.forgetedOrUpdatePassword(data);
+  @Post('forgetedPassword')
+  forgetedPassword(@Body() data: UpdateUserForgetPasswordDto) {
+    return this.userService.forgetedPassword(data);
   }
 
   @UseGuards(AuthGuard('local'))
