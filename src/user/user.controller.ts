@@ -127,7 +127,7 @@ export class UserController {
     return this.userService.forgetedPassword(data);
   }
 
-  @UseGuards(AuthGuard('local'))
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Compare password came by body with password registered by userId sended by param',
     description: `Method created for compare password came by body with password registered by userId sended by param, return function 
@@ -141,7 +141,7 @@ export class UserController {
     return this.userService.comparePasswordUser(userId, data);
   }
 
-  @UseGuards(AuthGuard('local'))
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Compare password came by body with password registered by userId sended by param',
     description: `Method created for compare password came by body with password registered by userId sended by param, return function boolean`,

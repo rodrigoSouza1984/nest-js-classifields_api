@@ -239,7 +239,7 @@ export class UserService {
 
   async getUserById(userId: number) {
     try {
-      console.log(userId, 77777)
+      
       const userExists = await this.userRepository.findOne({ where: { id: userId }, relations: ['mediaAvatar'] });
 
       if (!userExists) {
@@ -296,9 +296,10 @@ export class UserService {
 
   async updateUser(userId: number, updateUserDto: UpdateUserDto) {
     try {
+      
       const userExists = await this.userRepository.findOne({ where: { id: userId } })
 
-      if (!userExists) {
+      if (!userExists || userId === null || userId === undefined) {
         throw new HttpException(`User id:${userId} don't found`, HttpStatus.BAD_REQUEST);
       }
 

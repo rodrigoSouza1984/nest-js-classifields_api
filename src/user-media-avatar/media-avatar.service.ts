@@ -17,9 +17,12 @@ export class MediaAvatarService {
   ) { }
 
   async create(userId: number, data: MediaAvatarDto): Promise<User> {
-    try {
-
+    try {      
       const userExists = await this.userRepository.findOne({ where: { id: userId }, relations: ['mediaAvatar'] })
+
+      if (!userExists || userId === null || userId === undefined) {
+        throw new HttpException(`User id:${userId} don't found`, HttpStatus.BAD_REQUEST);
+      }
 
       if (userExists.mediaAvatar) {
         const mediaDeleted = await this.deleteMedia(userExists.id, userExists.mediaAvatar.name)        
