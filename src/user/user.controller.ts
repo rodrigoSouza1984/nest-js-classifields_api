@@ -183,7 +183,18 @@ export class UserController {
         }
       }
     }
+  }
 
+  //@UseGuards(JwtAuthGuard)
+  @ApiOperation({
+    description: `Method return users by filter like send query header one word is ok to make filter`,
+    tags: ['user'],
+  })
+  @Get('/getByLikeFilter/list-by-filter-like')
+  async getByFilterLike(
+    @Query() query: { userName: string; realName: string; email: string },
+  ){
+    return await this.userService.getByFilterLike(query);
   }
 
 }

@@ -59,9 +59,8 @@ export class UserService {
         }
       }
 
-      console.log(createUserDto)
       const user = new User()
-
+      
       user.userName = createUserDto.userName
       user.realName = createUserDto.realName
       user.email = createUserDto.email
@@ -78,7 +77,7 @@ export class UserService {
         return await this.userRepository.findOne({ where: { id: userCreated.id }, relations: ['mediaAvatar'] })
 
       } else {
-        console.log(userCreated)
+        //console.log(userCreated)
         return userCreated
       }
 
@@ -318,14 +317,20 @@ export class UserService {
   }
 
   async removeUser(userId: number) {
-    try {
+    try {      
       const userExists = await this.userRepository.findOne({ where: { id: userId } })
 
       if (!userExists) {
         throw new HttpException(`User id:${userId} don't found`, HttpStatus.BAD_REQUEST);
       }
 
-      return await this.userRepository.delete(userId)
+      const userDeleted = await this.userRepository.delete(userId)
+
+      if(userDeleted){
+        return true
+      }else{
+        return false
+      }
 
     } catch (err) {
       if (err.driverError) {
@@ -528,5 +533,54 @@ export class UserService {
   async findOne(email: string): Promise<User | undefined> {
     return this.userRepository.findOne({ where: { email: email }, relations: ['mediaAvatar'] });
   }
+
+  async getByFilterLike(query: {
+    userName: string;
+    realName: string;
+    email: string
+  }) {
+    try {
+      const { userName, realName, email } = query;
+
+      const queryBuilder = this.userRepository.createQueryBuilder('user');
+
+      let hasWhere = false;
+      if (userName) {
+        queryBuilder.where(`user.userName LIKE '%${userName.toLocaleLowerCase().toString()}%'`);
+        hasWhere = true;
+      }
+
+      if (email) {
+        queryBuilder.where(`user.email LIKE '%${email.toLocaleLowerCase().toString()}%'`);
+        hasWhere = true;
+      }
+
+      if (realName) {
+        if (hasWhere) {
+          queryBuilder.orWhere(`user.realName LIKE '%${realName}%'`);
+        } else {
+          queryBuilder.where(`user.realName LIKE '%${realName}%'`);
+        }
+      }
+
+     const a = await queryBuilder.getMany();
+
+     return {total: a.length, users: a}
+     
+    } catch (err) {
+      if (err.driverError) {
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
+      } else {
+        if (err.status >= 300 && err.status < 500) {
+          throw err
+        } else if (err.message) {
+          throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        } else {
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+      }
+    }
+  }
+
 
 }
