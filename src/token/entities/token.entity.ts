@@ -8,15 +8,25 @@ export class TokenEntity {
     @Column()
     email: string;    
 
-    @Column({ type: 'longtext', nullable: true })
+    @Column({ nullable: true })
     hash: string;    
 
-    @CreateDateColumn({ type: 'timestamp' })
+    @Column({ type: "timestamp" })  
     createdAt: Date;
 
-    @UpdateDateColumn({ type: 'timestamp' })
+    @Column({ type: 'timestamp' })
     updatedAt: Date;
 
-    @DeleteDateColumn({ type: 'timestamp' })
+    @Column({ type: 'timestamp' })
     deletedAt: Date;
+
+    //ABAIXO FORMA PARA MYSQL POSTGRES QUE USO NORMALMENTE POREM FREEDATABASE TEM QUE SER DO JEITO ACIMA USADO
+    // @CreateDateColumn({ type: 'timestamp' })
+    // createdAt: Date;
+
+    // @UpdateDateColumn({ type: 'timestamp' })
+    // updatedAt: Date;
+
+    // @DeleteDateColumn({ type: 'timestamp' })
+    // deletedAt: Date;
 }

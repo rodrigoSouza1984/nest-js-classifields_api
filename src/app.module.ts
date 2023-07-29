@@ -17,6 +17,8 @@ import { ProductMediaModule } from './product-media/product-media.module';
   imports: [ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
   TypeOrmModule.forRootAsync({
     useFactory: () => ({
+      // type: 'postgres',
+      // url: process.env.DATABASE_URL,
       type: 'mysql',
       host: process.env.DB_HOST,
       port: parseInt(process.env.DB_PORT) || 3306,
@@ -26,10 +28,10 @@ import { ProductMediaModule } from './product-media/product-media.module';
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       authPlugins: {
         mysql_native_password: () => require('mysql2-aurora-data-api-plugin')
-      },
+      },      
       autoLoadEntities: true,
       synchronize: true,
-      logging: false,
+      logging: false,      
     }),
   }),
     UserModule,
