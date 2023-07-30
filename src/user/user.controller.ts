@@ -104,7 +104,7 @@ export class UserController {
     return this.userService.updateUser(userId, updateUserDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'remove user by param : user id',
     description: `remove user data`,
