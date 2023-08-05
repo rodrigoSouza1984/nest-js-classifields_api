@@ -1,5 +1,5 @@
 import { User } from "src/user/entities/user.entity";
-import { TypeProductEnum } from "../entities/product.entity";
+import { NeighborhoodTypeEnum, TypeProductEnum } from "../entities/product.entity";
 import { ApiProperty } from "@nestjs/swagger";
 import { ProductMediaEntity } from "src/product-media/entities/product-media.entity";
 
@@ -15,10 +15,10 @@ export class CreateProductDto {
         description: 'REQUIRED - name that peolple want user in aplication, but this name have to be unique',
         example: 'JoseSilva'
     })   
-    ownerEmail?: string;
+    ownerEmailContact?: string;
 
     @ApiProperty({
-        description: 'REQUIRED - cantact phone',
+        description: 'OPTIONAL - cantact phone',
         example: '0xx-9xxxx-xxxx'
     })  
     ownerContactPhone?: string;
@@ -33,67 +33,97 @@ export class CreateProductDto {
         description: 'REQUIRED - All descriptions of your announcement ',
         example: '2 rooms, 2 bathrooms, pool ....'
     }) 
-    description?: string;
+    descriptionPlace?: string;    
 
     @ApiProperty({
-        description: 'REQUIRED "dailyValue or valuePerMonth" - Price daily your announcement, value sended at cents',
-        example: 'R$100,00 ....'
-    }) 
-    dailyValue?: number;   
-
-    @ApiProperty({
-        description: 'REQUIRED "dailyValue or valuePerMonth" - Price per month your announcement, value sended at cents',
-        example: 'R$1000,00 ....'
-    })
-    valuePerMonth?: number;
-
-    @ApiProperty({
-        description: 'REQUIRED - Street local where your announcement stay localizaded',
+        description: 'OPTIONAL - Street local where your announcement stay localizaded, default = "sem Rua"',
         example: 'Street: aabb....'
     }) 
     street?: string;    
 
     @ApiProperty({
-        description: 'REQUIRED - Neighborhood that your announcement stay',
+        description: 'OPTIONAL - Neighborhood that your announcement stay, default = "sem Bairro"',
         example: 'XXXX....'
     }) 
     neighborhood?: string;
 
     @ApiProperty({
-        description: 'REQUIRED - Complement about your neighborhood or street etc, that your announcement stay on the street',
+        description: 'OPTIONAL - Complement about your neighborhood or street etc, that your announcement stay on the street',
         example: 'Bloc xx Apartment x....'
     }) 
     complement?: string;
 
     @ApiProperty({
-        description: 'REQUIRED - Number that your announcement stay on the street  ',
-        example: '122'
-    }) 
-    number?: number;  
-
-    @ApiProperty({
         description: 'REQUIRED - City of your announcement stay',
-        example: 'xxxxxx....'
+        example: 'São Paulo'
     }) 
     city?: string;
 
     @ApiProperty({
         description: 'REQUIRED - State of your announcement stay',
-        example: 'xx....'
+        example: 'SP'
     }) 
-    state?: string;
+    state?: string; 
+
+    @ApiProperty({
+        description: 'OPTIONAL - Number that your announcement stay on the street, default = "sem numero"  ',
+        example: '122'
+    }) 
+    number?: string;
     
     @ApiProperty({
         description: 'REQUIRED  - Postal code your announcement',
         example: 'xxxxx-xxx'
     })
     postalCode?: string; 
+    
+    @ApiProperty({
+        description: 'REQUIRED - price of product',
+        example: '100.00'
+    })
+    price?: number; 
+
+    @ApiProperty({
+        description: 'REQUIRED - description about price, can be by mounth or by day or more options',
+        example: '100.00 by day'
+    })
+    descriptionPrice?: string; 
+
+    @ApiProperty({
+        description: 'OPTIONAL - about qtd rooms',
+        example: '2 rooms'
+    })
+    rooms?: number;
+
+    @ApiProperty({
+        description: 'OPTIONAL - place name of place',
+        example: 'maria salom'
+    })
+    placeName?: string;
+
+    @ApiProperty({
+        description: 'OPTIONAL - explain form of arrived local',
+        example: `Near maria's Mercad`
+    })
+    routePlace?: string;
 
     @ApiProperty({
         description: 'REQUIRED - Kind product of announcement - enum = [ farm, partyHall, house, apartment ]',
-        example: 'xx-xxx-xxx'
+        example: 'partyHall'
     })
     typeProductEnum?: TypeProductEnum;
+
+    @ApiProperty({
+        description: 'REQUIRED - Kind neighborhood local of announcement - enum = [ urban, rural]',
+        example: 'rural'
+    })
+    neighborhoodTypeEnum?: NeighborhoodTypeEnum; 
+    
+    @ApiProperty({
+        description: 'REQUIRED - User owner of announcement, send by param this property ',
+        example: '{url}/xxxx/userId'
+    })
+    user?: User;
 
     @ApiProperty({
         description: 'REQUIRED - Medias about your product minimum 1 maximum 5]',
@@ -101,9 +131,6 @@ export class CreateProductDto {
     })
     mediasProduct?: ProductMediaEntity[]
 
-    @ApiProperty({
-        description: 'REQUIRED - User owner of announcement, send by param this property ',
-        example: '{url}/xxxx/userId'
-    })
-    user?: User;
+    
+
 }

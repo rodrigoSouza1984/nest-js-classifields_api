@@ -9,6 +9,11 @@ export enum TypeProductEnum {
     APARTMENT = 'apartment'
 }
 
+export enum NeighborhoodTypeEnum {
+    URBAN = 'urban',
+    RURAL = 'rural'
+}
+
 @Entity()
 export class ProductEntity {
 
@@ -28,18 +33,12 @@ export class ProductEntity {
     title: string;
 
     @Column({ nullable: true })
-    description: string;
+    descriptionPlace: string;    
 
-    @Column({ nullable: true })
-    dailyValue: number;    
-
-    @Column({ nullable: true })
-    valuePerMonth: number;
-
-    @Column({ nullable: true })
+    @Column({ nullable: true , default: 'Sem Rua'})
     street: string;    
 
-    @Column({ nullable: true })
+    @Column({ nullable: true, default: 'Sem Bairro' })
     neighborhood: string;
 
     @Column({ nullable: true })
@@ -51,17 +50,38 @@ export class ProductEntity {
     @Column({ nullable: true })
     state: string;
 
-    @Column({ default: 0 })
-    number: number;   
+    @Column({ nullable: true, default: 'Sem Numero'})
+    number: string;   
     
-    @Column({ default: 0 })
+    @Column({ nullable: true, default: 0 })
     postalCode: string; 
+   
+    @Column({ nullable: true, default: 0 })
+    price: number; 
+
+    @Column({ nullable: true, default: 0 })
+    descriptionPrice: string; 
+
+    @Column({ nullable: true, default: 0 })
+    rooms: number; 
+
+    @Column({ nullable: true })
+    placeName: string;
+
+    @Column({ nullable: true })
+    routePlace: string;  
 
     @Column({
         type: 'enum',
         enum: TypeProductEnum        
     })
     typeProductEnum: TypeProductEnum;
+
+    @Column({
+        type: 'enum',
+        enum: NeighborhoodTypeEnum        
+    })
+    neighborhoodTypeEnum: NeighborhoodTypeEnum;
 
     @ManyToOne(() => User, (user) => user.products, {
         onUpdate: 'CASCADE',
@@ -75,22 +95,22 @@ export class ProductEntity {
     @JoinColumn()  
     mediasProduct: ProductMediaEntity[];   
 
-    @Column({ type: "timestamp" })  
-    createdAt: Date;
-
-    @Column({ type: 'timestamp' })
-    updatedAt: Date;
-
-    @Column({ type: 'timestamp' })
-    deletedAt: Date;
-
-    //ABAIXO FORMA PARA MYSQL POSTGRES QUE USO NORMALMENTE POREM FREEDATABASE TEM QUE SER DO JEITO ACIMA USADO
-    // @CreateDateColumn({ type: 'timestamp' })
+    // @Column({ type: "timestamp", nullable: true })  
     // createdAt: Date;
 
-    // @UpdateDateColumn({ type: 'timestamp' })
+    // @Column({ type: 'timestamp', nullable: true })
     // updatedAt: Date;
 
-    // @DeleteDateColumn({ type: 'timestamp' })
+    // @Column({ type: 'timestamp', nullable: true })
     // deletedAt: Date;
+
+    //ABAIXO FORMA PARA MYSQL POSTGRES QUE USO NORMALMENTE POREM FREEDATABASE TEM QUE SER DO JEITO ACIMA USADO
+    @CreateDateColumn({ type: 'timestamp' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ type: 'timestamp' })
+    updatedAt: Date;
+
+    @DeleteDateColumn({ type: 'timestamp' })
+    deletedAt: Date;
 }

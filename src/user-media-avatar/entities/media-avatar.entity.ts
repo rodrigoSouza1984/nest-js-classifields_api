@@ -14,7 +14,10 @@ export class UserMediaAvatarEntity {
     @Column()
     mimeType: string;
 
-    @Column({type: 'longtext', nullable: true })
+    // @Column({type: 'longtext', nullable: true })//to mysql need longtext
+    // url: string;
+
+    @Column({ nullable: true })//to postgress, dont have long text
     url: string;
 
     @OneToOne(() => User, (user) => user.mediaAvatar,{
@@ -23,23 +26,23 @@ export class UserMediaAvatarEntity {
     @JoinColumn()  
     user: User; 
 
-    @Column({ type: "timestamp" })  
-    createdAt: Date;
-
-    @Column({ type: 'timestamp' })
-    updatedAt: Date;
-
-    @Column({ type: 'timestamp' })
-    deletedAt: Date;
-
-    //ABAIXO FORMA PARA MYSQL POSTGRES QUE USO NORMALMENTE POREM FREEDATABASE TEM QUE SER DO JEITO ACIMA USADO
-    // @CreateDateColumn({ type: 'timestamp' })
+    // @Column({ type: "timestamp", nullable: true })  
     // createdAt: Date;
 
-    // @UpdateDateColumn({ type: 'timestamp' })
+    // @Column({ type: 'timestamp', nullable: true })
     // updatedAt: Date;
 
-    // @DeleteDateColumn({ type: 'timestamp' })
+    // @Column({ type: 'timestamp', nullable: true })
     // deletedAt: Date;
+
+    //ABAIXO FORMA PARA MYSQL POSTGRES QUE USO NORMALMENTE POREM FREEDATABASE TEM QUE SER DO JEITO ACIMA USADO
+    @CreateDateColumn({ type: 'timestamp' })
+    createdAt: Date;
+
+    @UpdateDateColumn({ type: 'timestamp' })
+    updatedAt: Date;
+
+    @DeleteDateColumn({ type: 'timestamp' })
+    deletedAt: Date;
 
 }

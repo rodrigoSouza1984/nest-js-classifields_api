@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ProductEntity } from './entities/product.entity';
 import { Repository } from 'typeorm';
@@ -32,38 +31,22 @@ export class ProductService {
         throw new HttpException(`Maximum 5 media about your product!`, HttpStatus.BAD_REQUEST);
       }
 
-      if (createProductDto.title === '' || createProductDto.title === undefined ||
-        createProductDto.ownerRealName === '' || createProductDto.ownerRealName === undefined ||
-        createProductDto.ownerEmail === '' || createProductDto.ownerEmail === undefined ||
-        createProductDto.ownerContactPhone === '' || createProductDto.ownerContactPhone === undefined ||
-        createProductDto.description === '' || createProductDto.description === undefined ||
-        createProductDto.typeProductEnum === null || createProductDto.typeProductEnum === undefined ||
-        createProductDto.street === '' || createProductDto.street === undefined ||
-        createProductDto.neighborhood === '' || createProductDto.neighborhood === undefined ||
-        createProductDto.postalCode === null || createProductDto.neighborhood === undefined ||
-        createProductDto.number === null || createProductDto.number === undefined ||
+      if (createProductDto.ownerRealName === '' || createProductDto.ownerRealName === undefined ||
+        createProductDto.ownerEmailContact === '' || createProductDto.ownerEmailContact === undefined || 
+        createProductDto.title === '' || createProductDto.title === undefined ||      
+        createProductDto.descriptionPlace === '' || createProductDto.descriptionPlace === undefined ||              
         createProductDto.city === '' || createProductDto.city === undefined ||
-        createProductDto.state === '' || createProductDto.state === undefined
+        createProductDto.state === '' || createProductDto.state === undefined ||
+        createProductDto.postalCode === null || createProductDto.postalCode === undefined ||
+        createProductDto.price === null || createProductDto.price === undefined ||
+        createProductDto.descriptionPrice === null || createProductDto.descriptionPrice === undefined ||
+        createProductDto.typeProductEnum === null || createProductDto.typeProductEnum === undefined ||  
+        createProductDto.neighborhoodTypeEnum === null || createProductDto.neighborhoodTypeEnum === undefined
       ) {
-        throw new HttpException(`Title, ownerRealName, ownerEmail, ownerContactPhone,
-        dailyValue, description, typeProductEnum, street, neighborhood, postalCode, 
-        city, state number must be sended!`, HttpStatus.BAD_REQUEST);
-      }
-
-      let dailyValueEmpty = false
-      let valuePerMonthEmpty = false
-
-      if (createProductDto.dailyValue === null || createProductDto.dailyValue === undefined) {
-        dailyValueEmpty = true
-      }
-
-      if (createProductDto.valuePerMonth === null || createProductDto.valuePerMonth === undefined) {
-        valuePerMonthEmpty = true
-      }
-
-      if (dailyValueEmpty === true && valuePerMonthEmpty === true) {
-        throw new HttpException(`daily value or value per month must be sended!`, HttpStatus.BAD_REQUEST);
-      }
+        throw new HttpException(`ownerRealName, ownerEmail, title,
+        descriptionPlace, typeProductEnum, postalCode, city, state, price, 
+        descriptionPrice, neighborhoodTypeEnum must be sended!`, HttpStatus.BAD_REQUEST);
+      }      
 
       const regexCepTest = /^(\d{5})-?(\d{3})$/
 
@@ -77,7 +60,7 @@ export class ProductService {
         throw new HttpException(`User don't found!`, HttpStatus.NOT_FOUND);
       }
 
-      if (userExists.email !== createProductDto.ownerEmail) {
+      if (userExists.email !== createProductDto.ownerEmailContact) {
         throw new HttpException(`Email sended must be the same of register user!`, HttpStatus.BAD_REQUEST);
       }
 
@@ -88,19 +71,24 @@ export class ProductService {
       const product = new ProductEntity()
 
       product.ownerRealName = createProductDto.ownerRealName
-      product.ownerEmailContact = createProductDto.ownerEmail
+      product.ownerEmailContact = createProductDto.ownerEmailContact
       product.ownerContactPhone = createProductDto.ownerContactPhone
       product.title = createProductDto.title
-      product.description = createProductDto.description
-      product.dailyValue = createProductDto.dailyValue
-      product.typeProductEnum = createProductDto.typeProductEnum
+      product.descriptionPlace = createProductDto.descriptionPlace 
       product.street = createProductDto.street
       product.neighborhood = createProductDto.neighborhood
       product.complement = createProductDto.complement
-      product.number = createProductDto.number
       product.city = createProductDto.city
       product.state = createProductDto.state
+      product.number = createProductDto.number
       product.postalCode = createProductDto.postalCode
+      product.price = createProductDto.price
+      product.descriptionPrice = createProductDto.descriptionPrice
+      product.rooms = createProductDto.rooms
+      product.placeName = createProductDto.placeName
+      product.routePlace = createProductDto.routePlace           
+      product.typeProductEnum = createProductDto.typeProductEnum
+      product.neighborhoodTypeEnum = createProductDto.neighborhoodTypeEnum      
       product.user = userExists
 
       const productCreated = await this.productRepository.save(product)
@@ -199,7 +187,7 @@ export class ProductService {
     }
   }
 
-  async update(productId: number, updateProductDto: UpdateProductDto):Promise<ProductEntity> {
+  async update(productId: number, updateProductDto: CreateProductDto):Promise<ProductEntity> {
     try {
       const productExists = await this.productRepository.findOne({ where: { id: productId } });
 

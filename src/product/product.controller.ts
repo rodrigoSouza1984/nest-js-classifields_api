@@ -1,7 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ProductService } from './product.service';
 import { CreateProductDto } from './dto/create-product.dto';
-import { UpdateProductDto } from './dto/update-product.dto';
 import { PaginatedProductDto } from './dto/paginated-product.dto';
 import { ProductEntity } from './entities/product.entity';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
@@ -66,7 +65,7 @@ export class ProductController {
     tags: ['product'],
   })
   @Patch(':productId')
-  update(@Param('productId') productId: number, @Body() updateProductDto: UpdateProductDto):Promise<ProductEntity>  {
+  update(@Param('productId') productId: number, @Body() updateProductDto: CreateProductDto):Promise<ProductEntity>  {
     return this.productService.update(productId, updateProductDto);
   }
 
