@@ -12,7 +12,7 @@ import { ProductMediaEntity } from './entities/product-media.entity';
 export class ProductMediaController {
   constructor(private readonly productMediaService: ProductMediaService) {}
 
-  //@UseGuards(JwtAuthGuard)   
+  @UseGuards(JwtAuthGuard)   
   @ApiOperation({
     summary: 'param will receive user id of product owner and product id too',
     description: `add media at the bucket and save data base media with your url`,              
@@ -24,7 +24,7 @@ export class ProductMediaController {
     return this.productMediaService.addMediasProduct(userId,productId,dataBody);
   } 
 
-  //@UseGuards(JwtAuthGuard)  
+  @UseGuards(JwtAuthGuard)  
   @ApiOperation({
     summary: 'Get all Medias Products',
     description: `Get all Medias Products, return user list paginated`,
@@ -37,7 +37,7 @@ export class ProductMediaController {
     return this.productMediaService.getAllMediasProducts(query);
   }
 
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Receive param: product id ',
     description: `Get product by product id sended param`,
@@ -48,7 +48,7 @@ export class ProductMediaController {
     return this.productMediaService.getOneByMediaId(mediaId);
   }
 
-  //@UseGuards(JwtAuthGuard)   
+  @UseGuards(JwtAuthGuard)   
   @ApiOperation({
     summary: 'param will receive user id product owner and file name media',
     description: `remove media data of data base, and remove in the STORAGE too media uploaded`,

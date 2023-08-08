@@ -60,7 +60,7 @@ export class UserService {
       }
 
       const user = new User()
-      
+
       user.userName = createUserDto.userName
       user.realName = createUserDto.realName
       user.email = createUserDto.email
@@ -89,11 +89,12 @@ export class UserService {
       if (err.driverError) {
         throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
       } else {
-        if (err.response.status > 500) {
-          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
-        } else {
-          console.log(err)
+        if (err.status >= 300 && err.status < 500) {
           throw err
+        } else if (err.message) {
+          throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        } else {
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
         }
       }
     }
@@ -178,9 +179,15 @@ export class UserService {
 
     } catch (err) {
       if (err.driverError) {
-        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
       } else {
-        throw err
+        if (err.status >= 300 && err.status < 500) {
+          throw err
+        } else if (err.message) {
+          throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        } else {
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
       }
     }
   }
@@ -203,9 +210,15 @@ export class UserService {
 
     } catch (err) {
       if (err.driverError) {
-        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
       } else {
-        throw err
+        if (err.status >= 300 && err.status < 500) {
+          throw err
+        } else if (err.message) {
+          throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        } else {
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
       }
     }
   }
@@ -229,16 +242,22 @@ export class UserService {
 
     } catch (err) {
       if (err.driverError) {
-        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
       } else {
-        throw err
+        if (err.status >= 300 && err.status < 500) {
+          throw err
+        } else if (err.message) {
+          throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        } else {
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
       }
     }
   }
 
   async getUserById(userId: number) {
     try {
-      
+
       const userExists = await this.userRepository.findOne({ where: { id: userId }, relations: ['mediaAvatar'] });
 
       if (!userExists) {
@@ -249,9 +268,15 @@ export class UserService {
 
     } catch (err) {
       if (err.driverError) {
-        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
       } else {
-        throw err
+        if (err.status >= 300 && err.status < 500) {
+          throw err
+        } else if (err.message) {
+          throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        } else {
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
       }
     }
   }
@@ -286,16 +311,22 @@ export class UserService {
 
     } catch (err) {
       if (err.driverError) {
-        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
       } else {
-        throw err
+        if (err.status >= 300 && err.status < 500) {
+          throw err
+        } else if (err.message) {
+          throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        } else {
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
       }
     }
   }
 
   async updateUser(userId: number, updateUserDto: UpdateUserDto) {
     try {
-      
+
       const userExists = await this.userRepository.findOne({ where: { id: userId } })
 
       if (!userExists || userId === null || userId === undefined) {
@@ -309,15 +340,21 @@ export class UserService {
 
     } catch (err) {
       if (err.driverError) {
-        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
       } else {
-        throw err
+        if (err.status >= 300 && err.status < 500) {
+          throw err
+        } else if (err.message) {
+          throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        } else {
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
       }
     }
   }
 
   async removeUser(userId: number) {
-    try {      
+    try {
       const userExists = await this.userRepository.findOne({ where: { id: userId } })
 
       if (!userExists) {
@@ -326,17 +363,23 @@ export class UserService {
 
       const userDeleted = await this.userRepository.delete(userId)
 
-      if(userDeleted){
+      if (userDeleted) {
         return true
-      }else{
+      } else {
         return false
       }
 
     } catch (err) {
       if (err.driverError) {
-        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR);
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
       } else {
-        throw err
+        if (err.status >= 300 && err.status < 500) {
+          throw err
+        } else if (err.message) {
+          throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        } else {
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
       }
     }
   }
@@ -563,10 +606,10 @@ export class UserService {
         }
       }
 
-     const a = await queryBuilder.getMany();
+      const a = await queryBuilder.getMany();
 
-     return {total: a.length, users: a}
-     
+      return { total: a.length, users: a }
+
     } catch (err) {
       if (err.driverError) {
         throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)

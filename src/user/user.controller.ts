@@ -35,7 +35,7 @@ export class UserController {
     return this.userService.create(createUserDto);
   }
 
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     summary: 'Get all registered users',
     description: `Get all registered users, return user list paginated`,
@@ -178,6 +178,8 @@ export class UserController {
       } else {
         if (err.status >= 300 && err.status < 500) {
           throw err
+        } else if (err.message) {
+          throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR)
         } else {
           throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
         }
@@ -185,7 +187,7 @@ export class UserController {
     }
   }
 
-  //@UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({
     description: `Method return users by filter like send query header one word is ok to make filter`,
     tags: ['user'],

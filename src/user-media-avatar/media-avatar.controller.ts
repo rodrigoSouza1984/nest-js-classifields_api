@@ -9,7 +9,7 @@ import { ApiTags,ApiOperation, ApiQuery, ApiResponse } from '@nestjs/swagger';
 export class MediaAvatarController {
   constructor(private readonly mediaAvatarService: MediaAvatarService) {}
 
-  //@UseGuards(JwtAuthGuard)  
+  @UseGuards(JwtAuthGuard)  
   @ApiOperation({
     summary: 'param will receive user id of avatar owner',
     description: `if user don t have avatar still, he will add avatar in user, 
@@ -21,7 +21,7 @@ export class MediaAvatarController {
     return await this.mediaAvatarService.create(userId,mediaAvatarDto);
   }    
 
-  //@UseGuards(JwtAuthGuard)   
+  @UseGuards(JwtAuthGuard)   
   @ApiOperation({
     summary: 'param will receive user id avatar owner and file name media',
     description: `remove media data of data base, and remove in the STORAGE too media uploaded`,

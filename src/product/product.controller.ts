@@ -79,7 +79,5 @@ export class ProductController {
   remove(@Param('ownerUserId') ownerUserId: number, @Param('productId') productId: number,) {
     return this.productService.delete(ownerUserId, productId);
   }
-
-
   
 }
