@@ -23,7 +23,7 @@ export class ProductController {
     return this.productService.create(ownerUserId,createProductDto);
   }
 
-  @UseGuards(JwtAuthGuard)
+  //no guards because users that not did login will can see products
   @ApiOperation({
     summary: 'Get all Products',
     description: `Get all Products, return user list paginated`,

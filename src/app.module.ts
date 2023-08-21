@@ -10,6 +10,7 @@ import { MediaAvatarModule } from './user-media-avatar/media-avatar.module';
 import { TokenModule } from './token/token.module';
 import { ProductModule } from './product/product.module';
 import { ProductMediaModule } from './product-media/product-media.module';
+import { MercadoPagoModule } from './mercado-pago/mercado-pago.module';
 
 
 
@@ -40,7 +41,8 @@ import { ProductMediaModule } from './product-media/product-media.module';
     MediaAvatarModule,
     TokenModule,
     ProductModule,
-    ProductMediaModule
+    ProductMediaModule,
+    MercadoPagoModule
   ],
   controllers: [AppController],
   providers: [AppService],
