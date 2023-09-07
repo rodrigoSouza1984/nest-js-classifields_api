@@ -1,6 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
 import { MercadoPagoService } from './mercado-pago.service';
-import { CreateMercadoPagoDto } from './dto/create-mercado-pago.dto';
+import { CreateMercadoPaymentDto } from './dto/create-mercado-payment.dto';
 import { UpdateMercadoPagoDto } from './dto/update-mercado-pago.dto';
 
 @Controller('mercado-pago')
@@ -8,13 +8,13 @@ export class MercadoPagoController {
   constructor(private readonly mercadoPagoService: MercadoPagoService) {}
 
   @Post()
-  create(@Body() createMercadoPagoDto: CreateMercadoPagoDto) {
+  create(@Body() createMercadoPagoDto: CreateMercadoPaymentDto) {
     return this.mercadoPagoService.create(createMercadoPagoDto);
   }
 
   @Get()
-  findAll() {
-    return this.mercadoPagoService.findAll();
+  getAllPayments() {
+    return this.mercadoPagoService.getAllPayments();
   }
 
   @Get(':id')

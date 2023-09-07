@@ -83,8 +83,7 @@ export class ProductService {
       product.number = createProductDto.number
       product.postalCode = createProductDto.postalCode
       product.price = createProductDto.price
-      product.descriptionPrice = createProductDto.descriptionPrice
-      product.rooms = createProductDto.rooms
+      product.descriptionPrice = createProductDto.descriptionPrice      
       product.placeName = createProductDto.placeName
       product.routePlace = createProductDto.routePlace           
       product.typeProductEnum = createProductDto.typeProductEnum

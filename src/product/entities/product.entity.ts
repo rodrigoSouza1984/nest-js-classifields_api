@@ -60,10 +60,7 @@ export class ProductEntity {
     price: number; 
 
     @Column({ nullable: true, default: 0 })
-    descriptionPrice: string; 
-
-    @Column({ nullable: true, default: 0 })
-    rooms: number; 
+    descriptionPrice: string;    
 
     @Column({ nullable: true })
     placeName: string;

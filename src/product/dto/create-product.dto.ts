@@ -87,14 +87,8 @@ export class CreateProductDto {
         description: 'REQUIRED - description about price, can be by mounth or by day or more options',
         example: '100.00 by day'
     })
-    descriptionPrice?: string; 
-
-    @ApiProperty({
-        description: 'OPTIONAL - about qtd rooms',
-        example: '2 rooms'
-    })
-    rooms?: number;
-
+    descriptionPrice?: string;
+        
     @ApiProperty({
         description: 'OPTIONAL - place name of place',
         example: 'maria salom'
