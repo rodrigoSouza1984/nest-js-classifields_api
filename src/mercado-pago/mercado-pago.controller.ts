@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { MercadoPagoService } from './mercado-pago.service';
 import { CreateMercadoPaymentDto } from './dto/create-mercado-payment.dto';
 import { UpdateMercadoPagoDto } from './dto/update-mercado-pago.dto';
@@ -12,10 +12,18 @@ export class MercadoPagoController {
     return this.mercadoPagoService.create(createMercadoPagoDto);
   }
 
-  @Get()
-  getAllPayments() {
-    return this.mercadoPagoService.getAllPayments();
+  @Get('/:userId')
+  getAllPayments(@Param('userId') userId: number, @Query() query: {         
+     sort: 'date_approved' | 'date_created' | 'date_last_updated' | 'id' | 'money_release_date';
+     criteria: 'asc' | 'desc'; 
+     external_reference: string; 
+     range: 'date_created' | 'date_last_updated' | 'date_approved' | 'money_release_date';
+     begin_date: string;//date -> '2023-09-07T00:00:00.000Z' or "NOW-XDAYS", "NOW-XMONTHS";
+     end_date: string//date -> '2023-09-07T00:00:00.000Z' or "NOW-XDAYS", "NOW-XMONTHS";
+    }) {
+    return this.mercadoPagoService.getAllPayments(userId, query);
   }
+  
 
   @Get(':id')
   findOne(@Param('id') id: string) {
