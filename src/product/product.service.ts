@@ -151,7 +151,7 @@ export class ProductService {
       const productExists = await this.productRepository.findOne({ where: { id: productId }, relations: ['mediasProduct'] });
 
       if (!productExists) {
-        throw new HttpException(`User id:${productId} don't found`, HttpStatus.BAD_REQUEST);
+        throw new HttpException(`Product id:${productId} don't found`, HttpStatus.BAD_REQUEST);
       }
 
       return productExists
