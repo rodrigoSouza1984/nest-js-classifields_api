@@ -25,9 +25,9 @@ export class MercadoPagoController {
   }
   
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.mercadoPagoService.findOne(+id);
+  @Get(':userId/:paymentId')
+  findOne(@Param('userId') userId: number, paymentId: string) {
+    return this.mercadoPagoService.getPaymentById(userId, paymentId);
   }
 
   @Patch(':id')
