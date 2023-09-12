@@ -35,8 +35,7 @@ export class ProductController {
   findAll(@Query() query: { page: number; take: number; orderBy: 'ASC' | 'DESC' }): Promise<PaginatedProductDto> {
     return this.productService.findAll(query);
   }
-
-  @UseGuards(JwtAuthGuard)
+  
   @ApiOperation({
     summary: 'Receive param: product id ',
     description: `Get product by product id sended param`,
