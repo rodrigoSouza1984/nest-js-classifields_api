@@ -120,13 +120,13 @@ try {
 
   if (!userExists) {
     throw new HttpException(`User id:${userId} don't found`, HttpStatus.BAD_REQUEST);
-  }
+  }  
 
   const headersRequest = {
     'Content-Type': 'application/json', // afaik this one is not needed
     'Authorization': `Bearer TEST-4225031559492417-061420-61232130f4435efef2496d3c8582f69e-826535867`,
   }; 
-   
+
   const payment = await lastValueFrom(
     this.httpService.get(`https://api.mercadopago.com/v1/payments/${paymentId}`,
       { headers: headersRequest}).pipe(

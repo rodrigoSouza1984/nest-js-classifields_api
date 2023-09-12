@@ -6,7 +6,7 @@ WORKDIR /usr/app
 
 COPY package*.json ./
 
-RUN npm i
+RUN npm i --force
 
 COPY . .
 
