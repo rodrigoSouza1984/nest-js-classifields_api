@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { CreateMercadoPaymentDto } from './dto/create-mercado-payment.dto';
+import { CreateMercadoPaymentCreditOrDebitDto } from './dto/create-mercado-card-debit-or-credit-payment.dto';
 import { UpdateMercadoPagoDto } from './dto/update-mercado-pago.dto';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom, map } from 'rxjs';
@@ -7,6 +7,8 @@ import { User } from 'src/user/entities/user.entity';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CreateChargeBackDto } from './dto/create-charge-back.dto';
+import { CreateMercadoPaymentBankSlipOrLotteryDto } from './dto/create-mercado-pago-bankslip-and-lottery-payment';
+import { createMercadoPagoPixDto } from './dto/create-mercado-pago-pix.dto';
 
 @Injectable()
 export class MercadoPagoService {
@@ -16,47 +18,129 @@ export class MercadoPagoService {
     private httpService: HttpService
   ) { }
 
-  async create(createMercadoPagoDto: CreateMercadoPaymentDto) {
+  // cartao teste => https://www.mercadopago.com.br/developers/pt/docs/checkout-bricks/additional-content/your-integrations/test/cards  
+  //link doc mercado livre => https://www.mercadopago.com.br/developers/pt/reference/payments/_payments/post  
+
+  async createPaymentCreditOrDebit(createMercadoPaymentCreditOrDebitDto: CreateMercadoPaymentCreditOrDebitDto) {
     try {
       const headersRequest = {
         'Content-Type': 'application/json', // afaik this one is not needed
-        'Authorization': `Bearer TEST-4225031559492417-061420-61232130f4435efef2496d3c8582f69e-826535867`,
+        'Authorization': `Bearer ${process.env.TOKEN_TEST_MERCADOPAGO}`,
+        //'X-Idempotency-Key:': `NÃO é OBRIGADO AINDA MAIS QUANDO TIVE ENVIAR UM UUID OU STRING ALEATORIA`
       };
 
       const createPost = await lastValueFrom(
-        this.httpService.post('https://api.mercadopago.com/v1/payments', createMercadoPagoDto,
+        this.httpService.post('https://api.mercadopago.com/v1/payments', createMercadoPaymentCreditOrDebitDto,
           { headers: headersRequest }).pipe(
             map(resp => resp.data)
           )
-      );
+      ).catch(err => {
+        console.log(err.config.response, 9999);
+        throw err
+      }
+      )
 
       return createPost
 
     } catch (err) {
       if (err.driverError) {
+        console.log(err.response.data)
         throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
       } else {
         if (err.status >= 300 && err.status < 500) {
+          console.log(err.response.data)
           throw err
         } else if (err.message) {
+          console.log(err.response.data)
           throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR)
         } else {
+          console.log(err.response.data)
           throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
         }
       }
     }
   }
 
-  // cartao teste
-  // Mastercard -> NUMERO -> 5031 4332 1540 6351 - COD SEG -> 123 - DATA VENC -> 11 / 25
+  async createPaymentBankSlipOrLoterica(createMercadoPaymentBankSlipOrLotteryDto: CreateMercadoPaymentBankSlipOrLotteryDto) {
+    try {
+      const headersRequest = {
+        'Content-Type': 'application/json', // afaik this one is not needed
+        'Authorization': `Bearer ${process.env.TOKEN_PRODUCAO_MERCADOPAGO}`,
+        //'X-Idempotency-Key:': `NÃO é OBRIGADO AINDA MAIS QUANDO TIVE ENVIAR UM UUID OU STRING ALEATORIA`
+      };
 
+      const createPost = await lastValueFrom(
+        this.httpService.post('https://api.mercadopago.com/v1/payments', createMercadoPaymentBankSlipOrLotteryDto,
+          { headers: headersRequest }).pipe(
+            map(resp => resp.data)
+          )
+      ).catch(err => {
+        console.log(err.config.response, 9999);
+        throw err
+      }
+      )
 
-  // compra com usuario diferente
+      return createPost
 
-  // Rafael Santos
-  // rafael@hotmail.com
-  // cpf 01234567890
+    } catch (err) {
+      if (err.driverError) {
+        console.log(err.response.data)
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
+      } else {
+        if (err.status >= 300 && err.status < 500) {
+          console.log(err.response.data)
+          throw err
+        } else if (err.message) {
+          console.log(err.response.data)
+          throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        } else {
+          console.log(err.response.data)
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+      }
+    }
+  }
 
+  
+  async createMercadoPagoPix(createMercadoPagoPixDto: createMercadoPagoPixDto) {
+    try {
+      const headersRequest = {
+        'Content-Type': 'application/json', // afaik this one is not needed
+        'Authorization': `Bearer ${process.env.TOKEN_TEST_MERCADOPAGO}`,
+        //'X-Idempotency-Key:': `NÃO é OBRIGADO AINDA MAIS QUANDO TIVE ENVIAR UM UUID OU STRING ALEATORIA`
+      };
+
+      const createPost = await lastValueFrom(
+        this.httpService.post('https://api.mercadopago.com/v1/payments', createMercadoPagoPixDto,
+          { headers: headersRequest }).pipe(
+            map(resp => resp.data)
+          )
+      ).catch(err => {
+        console.log(err.config.response, 9999);
+        throw err
+      }
+      )
+
+      return createPost
+
+    } catch (err) {
+      if (err.driverError) {
+        console.log(err.response.data)
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
+      } else {
+        if (err.status >= 300 && err.status < 500) {
+          console.log(err.response.data)
+          throw err
+        } else if (err.message) {
+          console.log(err.response.data)
+          throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        } else {
+          console.log(err.response.data)
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+      }
+    }
+  }
 
   async getAllPayments(userId: number, query: {
     sort: 'date_approved' | 'date_created' | 'date_last_updated' | 'id' | 'money_release_date';
@@ -78,7 +162,7 @@ export class MercadoPagoService {
 
       const headersRequest = {
         'Content-Type': 'application/json', // afaik this one is not needed
-        'Authorization': `Bearer TEST-4225031559492417-061420-61232130f4435efef2496d3c8582f69e-826535867`,
+        'Authorization': `Bearer ${process.env.TOKEN_TEST_MERCADOPAGO}`,
       };
 
       const queryParams = {
@@ -116,6 +200,7 @@ export class MercadoPagoService {
 
   async getPaymentById(userId: number, paymentId: string) {
     try {
+      //https://www.mercadopago.com.br/developers/pt/reference/payments/_payments_id/get
 
       const userExists = await this.userRepository.findOne({ where: { id: userId } })
 
@@ -125,7 +210,7 @@ export class MercadoPagoService {
 
       const headersRequest = {
         'Content-Type': 'application/json', // afaik this one is not needed
-        'Authorization': `Bearer TEST-4225031559492417-061420-61232130f4435efef2496d3c8582f69e-826535867`,
+        'Authorization': `Bearer ${process.env.TOKEN_PRODUCAO_MERCADOPAGO}`,
       };
 
       const payment = await lastValueFrom(
@@ -151,21 +236,21 @@ export class MercadoPagoService {
     }
   }
 
-
   //estorno metodo para pedir
   async getChargeBacksListByPaymentId(userId: number, paymentId: string) {
     try {
+      //https://www.mercadopago.com.br/developers/pt/reference/chargebacks/_payments_id_refunds/get
 
       const userExists = await this.userRepository.findOne({ where: { id: userId } })
 
       if (!userExists) {
         throw new HttpException(`User id:${userId} don't found`, HttpStatus.BAD_REQUEST);
-      }    
+      }
 
       const headersRequest = {
         'Content-Type': 'application/json', // afaik this one is not needed
-        'Authorization': `Bearer TEST-4225031559492417-061420-61232130f4435efef2496d3c8582f69e-826535867`,
-      };      
+        'Authorization': `Bearer ${process.env.TOKEN_TEST_MERCADOPAGO}`,
+      };
 
       const estorno = await lastValueFrom(
         this.httpService.get(`https://api.mercadopago.com/v1/payments/${paymentId}/refunds`,
@@ -190,20 +275,20 @@ export class MercadoPagoService {
     }
   }
 
-
-  async getChargeBackByPaymentIdAndRefundId(userId: number, paymentId: string, refundId : string) {
+  async getChargeBackByPaymentIdAndRefundId(userId: number, paymentId: string, refundId: string) {
     try {
+      //https://www.mercadopago.com.br/developers/pt/reference/chargebacks/_payments_id_refunds_refund_id/get
 
       const userExists = await this.userRepository.findOne({ where: { id: userId } })
 
       if (!userExists) {
         throw new HttpException(`User id:${userId} don't found`, HttpStatus.BAD_REQUEST);
-      }    
+      }
 
       const headersRequest = {
         'Content-Type': 'application/json', // afaik this one is not needed
-        'Authorization': `Bearer TEST-4225031559492417-061420-61232130f4435efef2496d3c8582f69e-826535867`,
-      };      
+        'Authorization': `Bearer ${process.env.TOKEN_TEST_MERCADOPAGO}`,
+      };
 
       const estorno = await lastValueFrom(
         this.httpService.get(`https://api.mercadopago.com/v1/payments/${paymentId}/refunds/${refundId}`,
@@ -239,16 +324,16 @@ export class MercadoPagoService {
 
       const headersRequest = {
         'Content-Type': 'application/json', // afaik this one is not needed
-        'Authorization': `Bearer TEST-4225031559492417-061420-61232130f4435efef2496d3c8582f69e-826535867`,
+        'Authorization': `Bearer ${process.env.TOKEN_TEST_MERCADOPAGO}`,
       };
-      
+
       const createChargeBack = await lastValueFrom(
         this.httpService.post(`https://api.mercadopago.com/v1/payments/${paymentId}/refunds`, createChargeBackDto,
           { headers: headersRequest }).pipe(
-            map(resp =>  resp.data)
+            map(resp => resp.data)
           )
       );
-      
+
       return createChargeBack
 
     } catch (err) {
@@ -266,20 +351,68 @@ export class MercadoPagoService {
     }
   }
 
+  async updatePayment(userId: number, paymentId: string, dataUpdate: UpdateMercadoPagoDto) {
+    try {
 
-  findAll() {
-    return `This action returns all mercadoPago`;
+      const userExists = await this.userRepository.findOne({ where: { id: userId } })
+
+      if (!userExists) {
+        throw new HttpException(`User id:${userId} don't found`, HttpStatus.BAD_REQUEST);
+      }
+
+      const headersRequest = {
+        'Content-Type': 'application/json', // afaik this one is not needed
+        'Authorization': `Bearer ${process.env.TOKEN_TEST_MERCADOPAGO}`,
+      };
+
+      const createUpdate = await lastValueFrom(
+        this.httpService.put(`https://api.mercadopago.com/v1/payments/${paymentId}`, dataUpdate,
+          { headers: headersRequest }).pipe(
+            map(resp => resp.data)
+          )
+      );
+
+      return createUpdate
+    } catch (err) {
+      if (err.driverError) {
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
+      } else {
+        if (err.status >= 300 && err.status < 500) {
+          console.log(err)
+          throw err
+        } else if (err.message) {
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+        } else {
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+      }
+    }
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} mercadoPago`;
-  }
+  async reeiveWebHook(data: any) {
+    try {
+      console.log(data)
 
-  update(id: number, updateMercadoPagoDto: UpdateMercadoPagoDto) {
-    return `This action updates a #${id} mercadoPago`;
-  }
+      if(data.action === "payment.created"){
+        return ['created',data]
+      }else if(data.action === "payment.updated"){
+        return ['update',data]
+      }
 
-  remove(id: number) {
-    return `This action removes a #${id} mercadoPago`;
+      return true
+      
+    } catch (err) {
+      if (err.driverError) {
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
+      } else {
+        if (err.status >= 300 && err.status < 500) {
+          throw err
+        } else if (err.message) {
+          throw new HttpException([err.message, err], HttpStatus.INTERNAL_SERVER_ERROR)
+        } else {
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+      }
+    }
   }
 }
