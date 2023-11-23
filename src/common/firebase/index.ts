@@ -1,30 +1,27 @@
 
 import * as admin from 'firebase-admin';
-const serviceAccount = require('../../../classifields-a6331-firebase-adminsdk-7s7le-64ddaf8414.json');
+import { CreatePushNotificationDto } from 'src/firebase-push-and-device-register/dto/create-push-notification.dto';
+
+let serviceAccount = null
+serviceAccount = require('../../../classifields-a6331-firebase-adminsdk-7s7le-64ddaf8414.json');
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
-  storageBucket: 'classifields-a6331.appspot.com'  
+  storageBucket: 'classifields-a6331.appspot.com'
 });
 
-const uploadBase64MediaToFirebaseStorage = async (base64String: string, mimeType:string, filePathParam : string) => {   
+const uploadBase64MediaToFirebaseStorage = async (base64String: string, mimeType: string, filePathParam: string) => {
 
   return new Promise((resolve, reject) => {
-
-  //  const timestamp = new Date().getTime();
-  //  const fileName = `${timestamp}_teste.jpeg`;
-  //  const filePath = `caminho/para/o/arquivo/${fileName}`;
 
     const bucket = admin.storage().bucket();
 
     const file = bucket.file(filePathParam);
-    const buffer = Buffer.from(base64String.split(',')[1], 'base64');       
-    //aki usa o split poqr vem com data:image/jpeg;base64, do base 64 e no firebase nao aceita com isso  
-    
+    const buffer = Buffer.from(base64String.split(',')[1], 'base64');
+
     const stream = file.createWriteStream({
       metadata: {
-        contentType: mimeType                                               
-        //'image/jpeg' // Substitua pelo tipo de arquivo que você está enviando
+        contentType: mimeType
       }
     });
 
@@ -45,27 +42,46 @@ const uploadBase64MediaToFirebaseStorage = async (base64String: string, mimeType
 
     stream.end(buffer);
   });
-} 
+}
 
 const deleteMediaToFirebaseStorage = async (filePathParam: string) => {
-  try{
+  try {
     const bucket = admin.storage().bucket();
 
     const file = bucket.file(filePathParam).delete()
 
     return true
-  }catch(err)  {
+  } catch (err) {
     if (err.driverError) {
       return err.driverError
     } else {
       return err
     }
-  }  
+  }
 }
 
-export default { 
-  uploadBase64MediaToFirebaseStorage, 
-  deleteMediaToFirebaseStorage 
+const postPushNotification = (data: CreatePushNotificationDto) => {  
+
+    return admin.messaging().sendEachForMulticast({
+      tokens: data.tokens,
+      notification: data.notification,     
+      data: data.data,
+    })
+    .then((response) => {
+      console.log(response, 1111)
+      return response
+    })
+    .catch((error) => {
+      console.log(error, 222);
+      return error
+    });
+ 
+};
+
+export default {
+  uploadBase64MediaToFirebaseStorage,
+  deleteMediaToFirebaseStorage,
+  postPushNotification
 };
 
 

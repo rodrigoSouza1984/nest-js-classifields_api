@@ -1,6 +1,8 @@
 import { Column, CreateDateColumn, DeleteDateColumn, Entity, Generated, JoinColumn, OneToMany, OneToOne, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 import { UserMediaAvatarEntity } from "../../user-media-avatar/entities/media-avatar.entity";
 import { ProductEntity } from "src/product/entities/product.entity";
+import { FirebaseDeviceRegisterEntity } from "src/firebase-push-and-device-register/entities/firebase-device-register.entity";
+
 
 export enum UserStatusEnum {
     ACTIVE = 'active',
@@ -64,6 +66,11 @@ export class User {
         cascade: true,
     })
     products: ProductEntity[];
+
+    @OneToOne(() => FirebaseDeviceRegisterEntity, (firebaseDeviceRegister) => firebaseDeviceRegister.user, {
+        cascade: true,
+    })
+    firebaseDeviceRegister: FirebaseDeviceRegisterEntity;
 
     // @Column({ type: "timestamp", nullable: true })  
     // createdAt: Date;

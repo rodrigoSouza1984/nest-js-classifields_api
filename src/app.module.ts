@@ -11,8 +11,7 @@ import { TokenModule } from './token/token.module';
 import { ProductModule } from './product/product.module';
 import { ProductMediaModule } from './product-media/product-media.module';
 import { MercadoPagoModule } from './mercado-pago/mercado-pago.module';
-
-
+import { FirebasePushAndDeviceRegisterModule } from './firebase-push-and-device-register/firebase-push-and-device-register.module';
 
 @Module({
   imports: [ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
@@ -42,7 +41,8 @@ import { MercadoPagoModule } from './mercado-pago/mercado-pago.module';
     TokenModule,
     ProductModule,
     ProductMediaModule,
-    MercadoPagoModule
+    MercadoPagoModule, 
+    FirebasePushAndDeviceRegisterModule
   ],
   controllers: [AppController],
   providers: [AppService],
