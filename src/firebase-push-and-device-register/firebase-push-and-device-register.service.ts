@@ -8,12 +8,16 @@ import { Repository } from 'typeorm';
 import { FirebaseDeviceRegisterEntity } from './entities/firebase-device-register.entity';
 import index from '../common/firebase';
 import { CreatePushNotificationDto } from './dto/create-push-notification.dto';
+import { PushNotificationDataBaseService } from 'src/push-notification-data-base/push-notification-data-base.service';
+import { CreatePushNotificationDataBaseDto } from 'src/push-notification-data-base/dto/create-push-notification-data-base.dto';
 
 @Injectable()
 export class FirebasePushAndDeviceRegisterService {
   constructor(
     @InjectRepository(User) private userRepository: Repository<User>,
     @InjectRepository(FirebaseDeviceRegisterEntity) private firebaseDeviceRegisterEntityRepository: Repository<FirebaseDeviceRegisterEntity>,
+    private pushNotificationDataBaseService: PushNotificationDataBaseService
+
   ) { }
 
 
@@ -181,7 +185,7 @@ export class FirebasePushAndDeviceRegisterService {
     try {
 
       let page = 1;
-      let take = 500;
+      let take = 500;    
 
       if (data.tokens.length === 0) {
 
@@ -198,8 +202,8 @@ export class FirebasePushAndDeviceRegisterService {
             .select('registerFirebase.token', 'token')
 
             .skip(take * (page - 1))
-            .take(take)  
-            .orderBy('comment.id', 'DESC');          
+            .take(take)
+            .orderBy('comment.id', 'DESC');
 
           const registeredsTokens = await queryToken.getRawMany();
 
@@ -212,10 +216,39 @@ export class FirebasePushAndDeviceRegisterService {
           page++
         }
 
+        let pushInDataBase: CreatePushNotificationDataBaseDto = {
+          message: data.notification.body ? data.notification.body : null,
+          title: data.notification.title ? data.notification.title : null,
+          imageUrl: data.notification.imageUrl ? data.notification.imageUrl : null,
+          allUsers: true,
+          userId: null
+        }
+
+        await this.pushNotificationDataBaseService.createPushInDataBase(pushInDataBase)
+
       } else {
 
-        return index.postPushNotification(data)
-        
+        const notificationSend = index.postPushNotification(data)
+
+        const queryUsers = await this.firebaseDeviceRegisterEntityRepository.createQueryBuilder('tokensRegistereds')
+          .where('tokensRegistereds.tokens IN (:...tokens) ', { tokens: data.tokens })
+
+        const tokensRegistereds: any = await queryUsers.getMany()
+
+
+        for await (const tokenRegistered of tokensRegistereds) {
+
+          let pushInDataBase: CreatePushNotificationDataBaseDto = {
+            message: data.notification.body ? data.notification.body : null,
+            title: data.notification.title ? data.notification.title : null,
+            imageUrl: data.notification.imageUrl ? data.notification.imageUrl : null,
+            allUsers: false,
+            userId: tokenRegistered.userId
+          }
+
+          await this.pushNotificationDataBaseService.createPushInDataBase(pushInDataBase)
+
+        }
       }
 
     } catch (err) {
