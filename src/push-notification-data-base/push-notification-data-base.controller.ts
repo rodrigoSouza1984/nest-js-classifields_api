@@ -13,30 +13,20 @@ export class PushNotificationDataBaseController {
   }
 
   @Get()
-  findAll(@Query() query: {
+  findAllPushInDataBaseByQuerys(@Query() query: {
     userId: number;
     typeFilter: 'allUsers' | 'noAllUsers';
     page: number; 
     take: number; 
     orderBy: 'ASC' | 'DESC';
   }) {
-    return this.pushNotificationDataBaseService.findAllByQuery(query);
+    return this.pushNotificationDataBaseService.findAllPushInDataBaseByQuerys(query);
   }
 
- 
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.pushNotificationDataBaseService.findOne(+id);
+  @Delete('')
+  remove(@Body() pushInDataBaseId: number[]) {
+    return this.pushNotificationDataBaseService.remove(pushInDataBaseId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePushNotificationDataBaseDto: UpdatePushNotificationDataBaseDto) {
-    return this.pushNotificationDataBaseService.update(+id, updatePushNotificationDataBaseDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.pushNotificationDataBaseService.remove(+id);
-  }
 }

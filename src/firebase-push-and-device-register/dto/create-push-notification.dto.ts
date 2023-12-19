@@ -23,6 +23,12 @@ export class CreatePushNotificationDto {
           })` ,
     })
     data?: DataDto | {}
+
+    @ApiProperty({
+        description: 'optional - name icon that use in front to show message',
+        example: `icon: 'telephone'` ,
+    })
+    icon?: string
 }
 
 export class NotificationDto{

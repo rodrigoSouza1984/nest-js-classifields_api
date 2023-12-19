@@ -14,6 +14,9 @@ export class PushNotificationDataBaseEntity {
     @Column({nullable: true})
     imageUrl: string;
 
+    @Column({nullable: true})
+    icon: string;
+
     @Column({default: false})
     allUsers: boolean;
 

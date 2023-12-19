@@ -55,7 +55,7 @@ export class FirebasePushAndDeviceRegisterService {
         const registerToken = new FirebaseDeviceRegisterEntity()
 
         registerToken.userId = data.userId
-        registerToken.token = data.token
+        registerToken.token = data.token        
         registerToken.user = user
 
         return await this.firebaseDeviceRegisterEntityRepository.save(registerToken)
@@ -221,6 +221,7 @@ export class FirebasePushAndDeviceRegisterService {
           title: data.notification.title ? data.notification.title : null,
           imageUrl: data.notification.imageUrl ? data.notification.imageUrl : null,
           allUsers: true,
+          icon: data.icon ? data.icon : null,
           userId: null
         }
 
@@ -235,7 +236,6 @@ export class FirebasePushAndDeviceRegisterService {
 
         const tokensRegistereds: any = await queryUsers.getMany()
 
-
         for await (const tokenRegistered of tokensRegistereds) {
 
           let pushInDataBase: CreatePushNotificationDataBaseDto = {
@@ -243,6 +243,7 @@ export class FirebasePushAndDeviceRegisterService {
             title: data.notification.title ? data.notification.title : null,
             imageUrl: data.notification.imageUrl ? data.notification.imageUrl : null,
             allUsers: false,
+            icon: data.icon ? data.icon : null,
             userId: tokenRegistered.userId
           }
 

@@ -23,6 +23,7 @@ export class PushNotificationDataBaseService {
       push.title = data.title ? data.title : null
       push.imageUrl = data.imageUrl ? data.imageUrl : null
       push.allUsers = data.allUsers ? data.allUsers : false
+      push.icon = data.icon ? data.icon : null
       push.userId = data.userId ? data.userId : null
 
       const pushDataBaseCreated = await this.pushNotificationDataBaseRepository.save(push) 
@@ -44,7 +45,7 @@ export class PushNotificationDataBaseService {
     }
   }
 
-  async findAllByQuery(query: {
+  async findAllPushInDataBaseByQuerys(query: {
     userId: number;
     typeFilter: 'allUsers' | 'noAllUsers';
     page: number; 
@@ -74,17 +75,25 @@ export class PushNotificationDataBaseService {
 
     return {total: total, notifications: notifications}
     
-  }
+  }  
 
-  findOne(id: number) {
-    return `This action returns a #${id} pushNotificationDataBase`;
-  }
+  async remove(pushInDataBaseId: number[]) {
+    try{
 
-  update(id: number, updatePushNotificationDataBaseDto: UpdatePushNotificationDataBaseDto) {
-    return `This action updates a #${id} pushNotificationDataBase`;
-  }
+      return await this.pushNotificationDataBaseRepository.delete(pushInDataBaseId)
 
-  remove(id: number) {
-    return `This action removes a #${id} pushNotificationDataBase`;
+    }catch(err){
+      if (err.driverError) {
+        throw new HttpException(err.driverError, HttpStatus.INTERNAL_SERVER_ERROR)
+      } else {
+        if (err.status >= 300 && err.status < 500) {
+          throw err
+        } else if (err.message) {
+          throw new HttpException(err.message, HttpStatus.INTERNAL_SERVER_ERROR)
+        } else {
+          throw new HttpException(err, HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+      }
+    }
   }
 }
