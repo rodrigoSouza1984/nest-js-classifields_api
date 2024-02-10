@@ -1,5 +1,6 @@
 
-Projeto completo Feito em Nest com MySql - TypeOrm - 
+Projeto completo Feito em Nest com MySql - TypeOrm - Docker - Firebase Storage - Google(GCP)
+deploy com Git atualizando o GCP 
 
 Login com token - Refresh Token - Integracao com Mercado Pago pagamentos
 
