@@ -1,3 +1,12 @@
+
+Projeto completo Feito em Nest com MySql - TypeOrm - Docker - Firebase Storage - Google(GCP)
+deploy com Git atualizando o GCP 
+
+Login com token - Refresh Token - Integracao com Mercado Pago pagamentos
+
+Projeto voltado para uma loja de produtos e anuncios dos produtos.......
+
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo_text.svg" width="320" alt="Nest Logo" /></a>
 </p>
