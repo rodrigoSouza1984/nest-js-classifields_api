@@ -87,7 +87,12 @@ export class ProductService {
       product.placeName = createProductDto.placeName
       product.routePlace = createProductDto.routePlace           
       product.typeProductEnum = createProductDto.typeProductEnum
-      product.neighborhoodTypeEnum = createProductDto.neighborhoodTypeEnum      
+      product.neighborhoodTypeEnum = createProductDto.neighborhoodTypeEnum  
+
+      if(createProductDto.discountItem){
+        product.discountItem = createProductDto.discountItem 
+      }
+         
       product.user = userExists
 
       const productCreated = await this.productRepository.save(product)

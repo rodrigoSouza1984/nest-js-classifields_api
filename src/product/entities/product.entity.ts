@@ -53,13 +53,10 @@ export class ProductEntity {
     @Column({ nullable: true, default: 'Sem Numero'})
     number: string;   
     
-    @Column({ nullable: true, default: 0 })
-    postalCode: string; 
-   
-    @Column({ nullable: true, default: 0 })
-    price: number; 
+    @Column({ nullable: true })
+    postalCode: string;    
 
-    @Column({ nullable: true, default: 0 })
+    @Column({ nullable: true })
     descriptionPrice: string;    
 
     @Column({ nullable: true })
@@ -67,6 +64,12 @@ export class ProductEntity {
 
     @Column({ nullable: true })
     routePlace: string;  
+
+    @Column({ type: 'numeric', precision: 20, scale: 2, default: 0 })
+    discountItem: number;
+   
+    @Column({ nullable: true, default: 0, type: 'numeric', precision: 20, scale: 2 })
+    price: number; 
 
     @Column({
         type: 'enum',

@@ -84,6 +84,12 @@ export class CreateProductDto {
     price?: number; 
 
     @ApiProperty({
+        description: 'OPTIONAL - discount of product in your final price',
+        example: '100.00'
+    })
+    discountItem?: number;
+
+    @ApiProperty({
         description: 'REQUIRED - description about price, can be by mounth or by day or more options',
         example: '100.00 by day'
     })

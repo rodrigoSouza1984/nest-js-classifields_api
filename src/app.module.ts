@@ -13,6 +13,7 @@ import { ProductMediaModule } from './product-media/product-media.module';
 import { MercadoPagoModule } from './mercado-pago/mercado-pago.module';
 import { FirebasePushAndDeviceRegisterModule } from './firebase-push-and-device-register/firebase-push-and-device-register.module';
 import { PushNotificationDataBaseModule } from './push-notification-data-base/push-notification-data-base.module';
+import { PurchaseModule } from './purchase/purchase.module';
 
 @Module({
   imports: [ConfigModule.forRoot({ envFilePath: '.env', isGlobal: true }),
@@ -43,7 +44,7 @@ import { PushNotificationDataBaseModule } from './push-notification-data-base/pu
     ProductModule,
     ProductMediaModule,
     MercadoPagoModule, 
-    FirebasePushAndDeviceRegisterModule, PushNotificationDataBaseModule
+    FirebasePushAndDeviceRegisterModule, PushNotificationDataBaseModule, PurchaseModule
   ],
   controllers: [AppController],
   providers: [AppService],

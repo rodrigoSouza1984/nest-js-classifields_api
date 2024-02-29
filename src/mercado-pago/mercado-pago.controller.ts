@@ -1,10 +1,11 @@
-import { Controller, Get, Post, Body, Param, Query, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Query, UseGuards, Put } from '@nestjs/common';
 import { MercadoPagoService } from './mercado-pago.service';
 import { CreateMercadoPaymentBankSlipOrLotteryDto } from './dto/create-mercado-pago-bankslip-and-lottery-payment';
 import { CreateMercadoPaymentCreditOrDebitDto } from './dto/create-mercado-card-debit-or-credit-payment.dto';
 import { CreateChargeBackDto } from './dto/create-charge-back.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { ApiOperation, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { UpdateMercadoPagoDto } from './dto/update-mercado-pago.dto';
 
 
 @ApiTags('mercado-pago')
@@ -17,7 +18,7 @@ export class MercadoPagoController {
     description: `Make a payment by credit card and debit card`,
     tags: ['mercado-pago'],
   })  
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   @Post('/createPaymentCreditOrDebit')
   createPaymentCreditOrDebit(@Body() createMercadoPaymentCreditOrDebitDto: CreateMercadoPaymentCreditOrDebitDto) {
     return this.mercadoPagoService.createPaymentCreditOrDebit(createMercadoPaymentCreditOrDebitDto);
@@ -28,18 +29,18 @@ export class MercadoPagoController {
     description: `Make a payment by bankslip and lottery`,
     tags: ['mercado-pago'],
   })
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   @Post('/bankSlipOrLoterica/createPaymentBankSlipOrLoterica')
-  createPaymentBankSlipOrLoterica(@Body() createMercadoPaymentBankSlipOrLotteryDto: CreateMercadoPaymentBankSlipOrLotteryDto) {    
-    return this.mercadoPagoService.createPaymentBankSlipOrLoterica(createMercadoPaymentBankSlipOrLotteryDto);
-  }
+  async createPaymentBankSlipOrLoterica(@Body() createMercadoPaymentBankSlipOrLotteryDto: CreateMercadoPaymentBankSlipOrLotteryDto) {   
+    return await this.mercadoPagoService.createPaymentBankSlipOrLoterica(createMercadoPaymentBankSlipOrLotteryDto);
+  }  
 
   @ApiOperation({
     summary: 'create-Payment-pix',
     description: `Make a payment by pix`,
     tags: ['mercado-pago'],
   })
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   @Post('/pix/createMercadoPagoPix')
   createMercadoPagoPix(@Body() createMercadoPaymentCreditOrDebitDto: CreateMercadoPaymentCreditOrDebitDto) {        
     return this.mercadoPagoService.createMercadoPagoPix(createMercadoPaymentCreditOrDebitDto);
@@ -56,7 +57,7 @@ export class MercadoPagoController {
   @ApiQuery({ name: 'range', description: 'date_created , date_last_updated , date_approved or money_release_date', required: false })
   @ApiQuery({ name: 'begin_date', description: 'string date -> 2023-09-07T00:00:00.000Z or NOW-XDAYS, NOW-XMONTHS', required: false })
   @ApiQuery({ name: 'end_date', description: 'string date -> 2023-09-07T00:00:00.000Z or NOW-XDAYS, NOW-XMONTHS', required: false })
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   @Get('/:userId')
   getAllPayments(@Param('userId') userId: number, @Query() query: {         
      sort: 'date_approved' | 'date_created' | 'date_last_updated' | 'id' | 'money_release_date';
@@ -113,11 +114,11 @@ export class MercadoPagoController {
     return this.mercadoPagoService.getChargeBackByPaymentIdAndRefundId(userId, paymentId, refundId );
   }
   
-  // @UseGuards(JwtAuthGuard)
-  // @Put('updatePayment/:userId/:paymentId')
-  // updatePayment(@Param('userId') userId: number, @Param('paymentId') paymentId: string, @Body() updateMercadoPagoDto: UpdateMercadoPagoDto) {
-  //   return this.mercadoPagoService.updatePayment(userId, paymentId, updateMercadoPagoDto);
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Put('updatePayment/:userId/:paymentId')
+  updatePayment(@Param('userId') userId: number, @Param('paymentId') paymentId: string, @Body() updateMercadoPagoDto: UpdateMercadoPagoDto) {
+    return this.mercadoPagoService.updatePayment(userId, paymentId, updateMercadoPagoDto);
+  }
   
   // @Post('reeiveWebHook')
   // reeiveWebHook(@Body() data: any) {

@@ -62,6 +62,20 @@ const deleteMediaToFirebaseStorage = async (filePathParam: string) => {
 
 const postPushNotification = (data: CreatePushNotificationDto) => {  
 
+  //metodo antigo cause nao mande nenhum token envia para todos usuarios
+  // return admin
+  //   .messaging()
+  //   .sendToDevice(
+  //     data.tokens,
+  //     {
+  //       notification: {
+  //         title: data.notification.title,
+  //         body: data.notification.body,
+  //         icon: data.notification.imageUrl
+  //       },
+  //       data: { } }
+  //   )
+
     return admin.messaging().sendEachForMulticast({
       tokens: data.tokens,
       notification: data.notification,     

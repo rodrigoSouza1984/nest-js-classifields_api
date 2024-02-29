@@ -67,7 +67,7 @@ export class MercadoPagoService {
         'Content-Type': 'application/json', // afaik this one is not needed
         'Authorization': `Bearer ${process.env.TOKEN_PRODUCAO_MERCADOPAGO}`,
         //'X-Idempotency-Key:': `NÃO é OBRIGADO AINDA MAIS QUANDO TIVE ENVIAR UM UUID OU STRING ALEATORIA`
-      };
+      };     
 
       const createPost = await lastValueFrom(
         this.httpService.post('https://api.mercadopago.com/v1/payments', createMercadoPaymentBankSlipOrLotteryDto,
@@ -210,7 +210,7 @@ export class MercadoPagoService {
 
       const headersRequest = {
         'Content-Type': 'application/json', // afaik this one is not needed
-        'Authorization': `Bearer ${process.env.TOKEN_PRODUCAO_MERCADOPAGO}`,
+        'Authorization': `Bearer ${process.env.TOKEN_TEST_MERCADOPAGO}`,//para testar boleto o codigo loterica tem que ser token producao
       };
 
       const payment = await lastValueFrom(
@@ -363,6 +363,7 @@ export class MercadoPagoService {
       const headersRequest = {
         'Content-Type': 'application/json', // afaik this one is not needed
         'Authorization': `Bearer ${process.env.TOKEN_TEST_MERCADOPAGO}`,
+        //'Authorization': `Bearer ${process.env.TOKEN_PRODUCAO_MERCADOPAGO}`,
       };
 
       const createUpdate = await lastValueFrom(

@@ -6,7 +6,7 @@ export class ProductMediaEntity {
     @PrimaryGeneratedColumn()
     id: number;
 
-    @Column()
+    @Column({nullable: false, unique: true})
     name: string;
 
     @Column()

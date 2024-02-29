@@ -2,6 +2,7 @@ import { Column, CreateDateColumn, DeleteDateColumn, Entity, Generated, JoinColu
 import { UserMediaAvatarEntity } from "../../user-media-avatar/entities/media-avatar.entity";
 import { ProductEntity } from "src/product/entities/product.entity";
 import { FirebaseDeviceRegisterEntity } from "src/firebase-push-and-device-register/entities/firebase-device-register.entity";
+import { PurchaseEntity } from "src/purchase/entities/purchase.entity";
 
 
 export enum UserStatusEnum {
@@ -71,6 +72,11 @@ export class User {
         cascade: true,
     })
     firebaseDeviceRegister: FirebaseDeviceRegisterEntity;
+
+    @OneToMany(() => PurchaseEntity, (purchaseEntity) => purchaseEntity.buyer, {
+        cascade: true,
+    })
+    purchases: PurchaseEntity[];
 
     // @Column({ type: "timestamp", nullable: true })  
     // createdAt: Date;
