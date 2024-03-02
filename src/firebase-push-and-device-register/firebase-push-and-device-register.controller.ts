@@ -15,7 +15,7 @@ export class FirebasePushAndDeviceRegisterController {
     description: `method to create a new register token firebase for pushs, or too refresh this token`,
     tags: ['firebase-push-and-device-register'],
   })  
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   @Post()
   async createOrUpdateRegisterToken(@Body() data: CreateFirebaseDeviceRegisterDto) {
     return await this.firebasePushAndDeviceRegisterService.createOrUpdateRegisterToken(data);
@@ -29,7 +29,7 @@ export class FirebasePushAndDeviceRegisterController {
   @ApiQuery({ name: 'page', description: 'number of page this pagination', required: false })
   @ApiQuery({ name: 'take', description: 'quantity itens per page', required: false })
   @ApiQuery({ name: 'orderBy', description: 'order that get bring itens asc or desc', required: false })
-  @UseGuards(JwtAuthGuard)
+  //@UseGuards(JwtAuthGuard)
   @Get()
   findAllTokenRegisters(@Query() query: { page: number; take: number; orderBy: 'ASC' | 'DESC' }) {
     return this.firebasePushAndDeviceRegisterService.findAllTokenRegisters(query);

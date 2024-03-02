@@ -55,7 +55,7 @@ export class FirebasePushAndDeviceRegisterService {
         const registerToken = new FirebaseDeviceRegisterEntity()
 
         registerToken.userId = data.userId
-        registerToken.token = data.token        
+        registerToken.token = data.token
         registerToken.user = user
 
         return await this.firebaseDeviceRegisterEntityRepository.save(registerToken)
@@ -185,7 +185,28 @@ export class FirebasePushAndDeviceRegisterService {
     try {
 
       let page = 1;
-      let take = 500;    
+      let take = 500;
+
+      if (!data.notification.title || data.notification.title === '') {
+        throw new HttpException(`message must have a title`, HttpStatus.BAD_REQUEST)
+      }
+
+      if (!data.notification.body || data.notification.body === '') {
+        throw new HttpException(`message must have a body`, HttpStatus.BAD_REQUEST)
+      }
+
+      // Verifica se a string contém '.com' e comeca 'https://'
+      if (!data.notification.imageUrl.match(/\.com/) || !data.notification.imageUrl.match(/^https:\/\//)) {
+        throw new HttpException(`message must have a url valid https://.....-.com or send '' cause not have a url`, HttpStatus.BAD_REQUEST)
+      }
+
+      if (data.notification.imageUrl === '') {
+        delete data.notification.imageUrl
+      }
+
+      if (data.data === '') {
+        delete data.data
+      }
 
       if (data.tokens.length === 0) {
 
@@ -232,9 +253,13 @@ export class FirebasePushAndDeviceRegisterService {
         const notificationSend = index.postPushNotification(data)
 
         const queryUsers = await this.firebaseDeviceRegisterEntityRepository.createQueryBuilder('tokensRegistereds')
-          .where('tokensRegistereds.tokens IN (:...tokens) ', { tokens: data.tokens })
+          .where('tokensRegistereds.token IN (:...tokens) ', { tokens: data.tokens })
 
         const tokensRegistereds: any = await queryUsers.getMany()
+
+        if(tokensRegistereds.length > 0){
+          console.log('aaaa')
+        }
 
         for await (const tokenRegistered of tokensRegistereds) {
 
